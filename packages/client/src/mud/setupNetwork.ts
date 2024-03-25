@@ -18,8 +18,13 @@ import { createFaucetService } from "@latticexyz/services/faucet";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
-import { createBurnerAccount, transportObserver, ContractWrite } from "@latticexyz/common";
+import {
+  createBurnerAccount,
+  transportObserver,
+  ContractWrite,
+} from "@latticexyz/common";
 import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
+import { callFrom } from "@latticexyz/world/internal";
 import { Subject, share } from "rxjs";
 
 /*
@@ -65,7 +70,18 @@ export async function setupNetwork() {
     account: burnerAccount,
   })
     .extend(transactionQueue())
-    .extend(writeObserver({ onWrite: (write) => write$.next(write) }));
+    .extend(writeObserver({ onWrite: (write) => write$.next(write) }))
+    .extend(
+      callFrom({
+        worldAddress: networkConfig.worldAddress,
+        // TODO: how can we get access to the main wallet here?
+        // Maybe setting up the `wallet client` should be somehow separate from the initial network setup,
+        // since it depends on the main user wallet being connected.
+        // Also, what if the user changes their main wallet? How do we update the burner wallet?
+        delegatorAddress: "0x4f4ddafbc93cf8d11a253f21ddbcf836139efdec",
+        publicClient,
+      })
+    );
 
   /*
    * Create an object for communicating with the deployed World.
@@ -82,7 +98,13 @@ export async function setupNetwork() {
    * to the viem publicClient to make RPC calls to fetch MUD
    * events from the chain.
    */
-  const { tables, useStore, latestBlock$, storedBlockLogs$, waitForTransaction } = await syncToZustand({
+  const {
+    tables,
+    useStore,
+    latestBlock$,
+    storedBlockLogs$,
+    waitForTransaction,
+  } = await syncToZustand({
     config: mudConfig,
     address: networkConfig.worldAddress as Hex,
     publicClient,

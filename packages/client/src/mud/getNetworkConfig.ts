@@ -35,6 +35,7 @@ import worlds from "contracts/worlds.json";
  * for instructions on how to add networks.
  */
 import { supportedChains } from "./supportedChains";
+import { isHex } from "viem";
 
 export async function getNetworkConfig() {
   const params = new URLSearchParams(window.location.search);
@@ -47,7 +48,12 @@ export async function getNetworkConfig() {
    *    vite dev server was started or client was built
    * 4. The default, 31337 (anvil)
    */
-  const chainId = Number(params.get("chainId") || params.get("chainid") || import.meta.env.VITE_CHAIN_ID || 31337);
+  const chainId = Number(
+    params.get("chainId") ||
+      params.get("chainid") ||
+      import.meta.env.VITE_CHAIN_ID ||
+      31337
+  );
 
   /*
    * Find the chain (unless it isn't in the list of supported chains).
@@ -66,7 +72,13 @@ export async function getNetworkConfig() {
   const world = worlds[chain.id.toString()];
   const worldAddress = params.get("worldAddress") || world?.address;
   if (!worldAddress) {
-    throw new Error(`No world address found for chain ${chainId}. Did you run \`mud deploy\`?`);
+    throw new Error(
+      `No world address found for chain ${chainId}. Did you run \`mud deploy\`?`
+    );
+  }
+
+  if (!isHex(worldAddress)) {
+    throw new Error(`Invalid world address: ${worldAddress}`);
   }
 
   /*
