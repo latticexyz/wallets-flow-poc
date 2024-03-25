@@ -8,6 +8,8 @@ import { hardhat } from "wagmi/chains";
 import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { transportObserver } from "@latticexyz/common";
 import { fallback, webSocket } from "viem";
+import { Theme } from "@radix-ui/themes";
+import "@radix-ui/themes/styles.css";
 
 const config = createConfig({
   chains: [hardhat],
@@ -24,13 +26,15 @@ if (!rootElement) throw new Error("React root not found");
 const root = ReactDOM.createRoot(rootElement);
 
 root.render(
-  <WagmiProvider config={config}>
-    <QueryClientProvider client={client}>
-      <RainbowKitProvider>
-        <MUDProvider>
-          <App />
-        </MUDProvider>
-      </RainbowKitProvider>
-    </QueryClientProvider>
-  </WagmiProvider>
+  <Theme>
+    <WagmiProvider config={config}>
+      <QueryClientProvider client={client}>
+        <RainbowKitProvider>
+          <MUDProvider>
+            <App />
+          </MUDProvider>
+        </RainbowKitProvider>
+      </QueryClientProvider>
+    </WagmiProvider>
+  </Theme>
 );
