@@ -1,3 +1,4 @@
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useMUD } from "./MUDContext";
 
 const styleUnset = { all: "unset" } as const;
@@ -16,6 +17,8 @@ export const App = () => {
 
   return (
     <>
+      <ConnectButton />
+
       <table>
         <tbody>
           {tasks.map((task) => (
