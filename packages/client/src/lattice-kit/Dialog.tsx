@@ -1,52 +1,57 @@
-// index.jsx
-import * as React from "react";
+import { useEffect, useState } from "react";
 import { Flex, Text, Button, Dialog, TextField } from "@radix-ui/themes";
+import { useAccount } from "wagmi";
 
-const DialogDemo = () => (
-  <Dialog.Root>
-    <Dialog.Trigger>
-      <Button>Edit profile</Button>
-    </Dialog.Trigger>
+const LatticeKitDialog = () => {
+  const [open, setOpen] = useState(false);
+  const [shown, setShown] = useState(false);
+  const account = useAccount();
+  const isConnected = account?.isConnected;
 
-    <Dialog.Content maxWidth="450px">
-      <Dialog.Title>Edit profile</Dialog.Title>
-      <Dialog.Description size="2" mb="4">
-        Make changes to your profile.
-      </Dialog.Description>
+  console.log(account);
+  console.log(account?.address);
+  console.log(account?.isConnected);
 
-      <Flex direction="column" gap="3">
-        <label>
-          <Text as="div" size="2" mb="1" weight="bold">
-            Name
-          </Text>
-          <TextField.Root
-            defaultValue="Freja Johnsen"
-            placeholder="Enter your full name"
-          />
-        </label>
-        <label>
-          <Text as="div" size="2" mb="1" weight="bold">
-            Email
-          </Text>
-          <TextField.Root
-            defaultValue="freja@example.com"
-            placeholder="Enter your email"
-          />
-        </label>
-      </Flex>
+  useEffect(() => {
+    console.log("isConnected", isConnected);
 
-      <Flex gap="3" mt="4" justify="end">
-        <Dialog.Close>
-          <Button variant="soft" color="gray">
-            Cancel
-          </Button>
-        </Dialog.Close>
-        <Dialog.Close>
-          <Button>Save</Button>
-        </Dialog.Close>
-      </Flex>
-    </Dialog.Content>
-  </Dialog.Root>
-);
+    if (isConnected && !shown) {
+      setOpen(true);
+      setShown(true);
+    }
+  }, [shown, isConnected]);
 
-export default DialogDemo;
+  return (
+    <Dialog.Root open={open}>
+      <Dialog.Content maxWidth="450px">
+        <Dialog.Title>Generate app-signer</Dialog.Title>
+        <Dialog.Description size="2" mb="4">
+          Generate app-signer description
+        </Dialog.Description>
+
+        <Flex direction="column" gap="3">
+          More context ..
+        </Flex>
+
+        <Flex gap="3" mt="4" justify="end">
+          <Dialog.Close>
+            <Button
+              variant="soft"
+              color="gray"
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              Cancel
+            </Button>
+          </Dialog.Close>
+          <Dialog.Close>
+            <Button>Generate signer</Button>
+          </Dialog.Close>
+        </Flex>
+      </Dialog.Content>
+    </Dialog.Root>
+  );
+};
+
+export default LatticeKitDialog;

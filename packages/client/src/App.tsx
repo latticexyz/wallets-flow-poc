@@ -1,6 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useMUD } from "./MUDContext";
-import PopoverDemo from "./lattice-kit/Dialog";
+import LatticeKitDialog from "./lattice-kit/Dialog";
 
 const styleUnset = { all: "unset" } as const;
 
@@ -19,8 +19,7 @@ export const App = () => {
   return (
     <>
       <ConnectButton />
-
-      <PopoverDemo />
+      <LatticeKitDialog />
 
       <table>
         <tbody>
