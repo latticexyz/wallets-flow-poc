@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Box, Flex, Text, Button, Dialog, Tabs } from "@radix-ui/themes";
+import { Flex, Text, Button, Dialog, Tabs } from "@radix-ui/themes";
 import { useAccount } from "wagmi";
 
 type FlowState = "signer" | "balance" | "delegate" | "play";

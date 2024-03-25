@@ -8,7 +8,7 @@ export async function setupDevTools(network: SetupNetworkResult) {
     mountDevTools({
       config,
       publicClient: network.publicClient,
-      walletClient: network.walletClient,
+      walletClient: network.walletClient, // TODO: fix
       latestBlock$: network.latestBlock$,
       storedBlockLogs$: network.storedBlockLogs$,
       worldAddress: network.worldContract.address,

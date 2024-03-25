@@ -28,7 +28,8 @@ export function createSystemCalls(
    *   syncToRecs
    *   (https://github.com/latticexyz/mud/blob/main/templates/react/packages/client/src/mud/setupNetwork.ts#L77-L83).
    */
-  { tables, useStore, worldContract, waitForTransaction }: SetupNetworkResult,
+  { tables, useStore, waitForTransaction }: SetupNetworkResult,
+  worldContract // TODO: add type
 ) {
   const addTask = async (label: string) => {
     const tx = await worldContract.write.addTask([label]);
@@ -36,8 +37,12 @@ export function createSystemCalls(
   };
 
   const toggleTask = async (id: Hex) => {
-    const isComplete = (useStore.getState().getValue(tables.Tasks, { id })?.completedAt ?? 0n) > 0n;
-    const tx = isComplete ? await worldContract.write.resetTask([id]) : await worldContract.write.completeTask([id]);
+    const isComplete =
+      (useStore.getState().getValue(tables.Tasks, { id })?.completedAt ?? 0n) >
+      0n;
+    const tx = isComplete
+      ? await worldContract.write.resetTask([id])
+      : await worldContract.write.completeTask([id]);
     await waitForTransaction(tx);
   };
 
