@@ -12,11 +12,24 @@ const styleUnset = { all: "unset" } as const;
 // }
 
 export const App = () => {
+<<<<<<< HEAD
   // TODO: fix TS error
   const {
     systemCalls: { addTask, toggleTask, deleteTask },
     network: { tables, useStore },
   } = useMUDStore();
+=======
+  // TODO: walletClient - walletClient - app-signer
+  const {
+    network: { tables, useStore }, // , walletClient, worldContract
+    // systemCalls: { addTask, toggleTask, deleteTask },
+  } = useMUD();
+>>>>>>> 1fded51 (refactor MUDContext)
+
+  const { systemCalls } = useMUD();
+  const addTask = systemCalls?.addTask;
+  const toggleTask = systemCalls?.toggleTask;
+  const deleteTask = systemCalls?.deleteTask;
 
   const tasks = useStore((state) => {
     const records = Object.values(state.getRecords(tables.Tasks));

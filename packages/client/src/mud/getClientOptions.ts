@@ -3,6 +3,10 @@ import { transportObserver } from "@latticexyz/common";
 import { NetworkConfig } from "./getNetworkConfig";
 
 // TODO: cache?
+<<<<<<< HEAD
+=======
+// TODO: why TS error?
+>>>>>>> 1fded51 (refactor MUDContext)
 export const getClientOptions = (networkConfig: NetworkConfig): ClientConfig => {
   const clientOptions = {
     chain: networkConfig.chain,
