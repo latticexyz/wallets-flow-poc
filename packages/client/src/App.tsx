@@ -37,11 +37,7 @@ export const App = () => {
                 <input
                   type="checkbox"
                   checked={task.value.completedAt > 0n}
-                  title={
-                    task.value.completedAt === 0n
-                      ? "Mark task as completed"
-                      : "Mark task as incomplete"
-                  }
+                  title={task.value.completedAt === 0n ? "Mark task as completed" : "Mark task as incomplete"}
                   onChange={async (event) => {
                     event.preventDefault();
                     const checkbox = event.currentTarget;
@@ -55,13 +51,7 @@ export const App = () => {
                   }}
                 />
               </td>
-              <td>
-                {task.value.completedAt > 0n ? (
-                  <s>{task.value.description}</s>
-                ) : (
-                  <>{task.value.description}</>
-                )}
-              </td>
+              <td>{task.value.completedAt > 0n ? <s>{task.value.description}</s> : <>{task.value.description}</>}</td>
               <td align="right">
                 <button
                   type="button"
@@ -69,12 +59,7 @@ export const App = () => {
                   style={styleUnset}
                   onClick={async (event) => {
                     event.preventDefault();
-                    if (
-                      !window.confirm(
-                        "Are you sure you want to delete this task?"
-                      )
-                    )
-                      return;
+                    if (!window.confirm("Are you sure you want to delete this task?")) return;
 
                     const button = event.currentTarget;
                     button.disabled = true;
