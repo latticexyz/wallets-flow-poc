@@ -7,6 +7,7 @@ import { setupBurnerSigner } from "./mud/setupBurnerSigner";
 import { setupNetwork, SetupNetworkResult } from "./mud/setupNetwork";
 import { getNetworkConfig } from "./mud/getNetworkConfig";
 import { useMUDStore } from "./mud/mudStore";
+import { initFaucetService } from "./mud/initFaucetService";
 
 type MUDContextValue = {
   network?: SetupNetworkResult;
@@ -49,6 +50,9 @@ export const MUDProvider = ({ children }: Props) => {
        */
       const networkConfig = await getNetworkConfig();
       const network = store.network as SetupNetworkResult;
+     
+      await initFaucetService(burnerWalletClient, network, networkConfig);
+
       const worldContract = getContract({
         address: networkConfig.worldAddress as Hex,
         abi: IWorldAbi,
