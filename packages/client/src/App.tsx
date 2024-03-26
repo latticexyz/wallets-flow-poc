@@ -1,6 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import LatticeKitDialog from "./lattice-kit/Dialog";
-import { MUDState, useMUDStore } from "./mud/mudStore";
+import { MUDState, useMUD, useMUDStore } from "./mud/mudStore";
 import { useSetup } from "./mud/useSetup";
 
 const styleUnset = { all: "unset" } as const;
@@ -13,7 +13,7 @@ const styleUnset = { all: "unset" } as const;
 // }
 
 export const App = () => {
-  useSetup();
+  const status = useMUD();
 
   const tasks = useStore((state) => {
     const records = Object.values(state.getRecords(tables.Tasks));

@@ -9,29 +9,23 @@ import { getNetworkConfig } from "./mud/getNetworkConfig";
 import { useMUDStore } from "./mud/mudStore";
 import { initFaucetService } from "./mud/initFaucetService";
 import { setupDevTools } from "./mud/setupDevTools";
-
-type MUDContextValue = {
-  network?: SetupNetworkResult;
-  systemCalls?: ReturnType<typeof createSystemCalls>;
-};
-
-type SetupResult = {}; // TODO: define type
-
-const MUDContext = createContext<SetupResult | null>(null);
+import { useSetup } from "./mud/useSetup";
 
 type Props = {
   children: ReactNode;
+  loadingComponent: ReactNode;
 };
 
-export const MUDProvider = ({ children }: Props) => {
-  const [value, setValue] = useState<MUDContextValue | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+export const MUDProvider = ({ children, loadingComponent }: Props) => {
+  useSetup();
+
+  const status = useMUDStore((state) => state.state);
 
   return (
-    <MUDContext.Provider value={value}>
+    <>
       {/* TODO: handle loading states */}
-      {loading && <div>Loading...</div>}
-      {!loading && children}
-    </MUDContext.Provider>
+      {status === "loading" && loadingComponent}
+      {status !== "loading" && children}
+    </>
   );
 };
