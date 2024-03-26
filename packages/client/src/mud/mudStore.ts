@@ -3,30 +3,25 @@ import { SetupNetworkResult } from "./setupNetwork";
 import { WalletClient } from "viem";
 import { SystemCalls } from "./createSystemCalls";
 
-interface MUDState {
-  network: SetupNetworkResult | null;
-  setNetwork: (network: SetupNetworkResult) => void;
+type SetState = (state: MUDState) => void;
 
-  walletClient: WalletClient | null;
-  setWalletClient: (walletClient: WalletClient) => void;
+export type MUDState =
+  | {
+      state: "loading";
+    }
+  | {
+      state: "read";
+      network: SetupNetworkResult;
+    }
+  | {
+      state: "write";
+      network: SetupNetworkResult;
+      walletClient: WalletClient;
+      systemCalls: SystemCalls;
+      worldContract: any;
+    };
 
-  systemCalls: SystemCalls | null;
-  setSystemCalls: (systemCalls: SystemCalls) => void;
-
-  worldContract: any;
-  setWorldContract: (worldContract: any) => void;
-}
-
-export const useMUDStore = create<MUDState>((set) => ({
-  network: null,
-  setNetwork: (network: SetupNetworkResult) => set({ network }),
-
-  walletClient: null,
-  setWalletClient: (walletClient: WalletClient) => set({ walletClient }),
-
-  systemCalls: null,
-  setSystemCalls: (systemCalls: SystemCalls) => set({ systemCalls }),
-
-  worldContract: null,
-  setWorldContract: (worldContract: any) => set({ worldContract }),
+export const useMUDStore = create<MUDState & { set: SetState }>((set) => ({
+  state: "loading",
+  set,
 }));

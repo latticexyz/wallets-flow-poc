@@ -1,6 +1,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import LatticeKitDialog from "./lattice-kit/Dialog";
-import { useMUDStore } from "./mud/mudStore";
+import { MUDState, useMUDStore } from "./mud/mudStore";
+import { useSetup } from "./mud/useSetup";
 
 const styleUnset = { all: "unset" } as const;
 
@@ -12,11 +13,7 @@ const styleUnset = { all: "unset" } as const;
 // }
 
 export const App = () => {
-  // TODO: fix TS error
-  const {
-    systemCalls: { addTask, toggleTask, deleteTask },
-    network: { tables, useStore },
-  } = useMUDStore();
+  useSetup();
 
   const tasks = useStore((state) => {
     const records = Object.values(state.getRecords(tables.Tasks));
@@ -24,10 +21,13 @@ export const App = () => {
     return records;
   });
 
+  const status = useMUDStore((state) => state.state);
+
   return (
     <>
       <ConnectButton />
       <LatticeKitDialog />
+      {status === "write" && <TodoList />}
 
       <table>
         <tbody>
@@ -115,4 +115,23 @@ export const App = () => {
       </table>
     </>
   );
+};
+
+const TodoList = () => {
+  const {
+    network: { useStore },
+  } = useMUDStore((state) => {
+    if (state.state === "loading") {
+      throw Error();
+    }
+    return state;
+  });
+
+  const tasks = useStore((state) => {
+    const records = Object.values(state.getRecords(tables.Tasks));
+    records.sort((a, b) => Number(a.value.createdAt - b.value.createdAt));
+    return records;
+  });
+
+  return <></>;
 };
