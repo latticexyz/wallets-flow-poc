@@ -18,7 +18,7 @@ import { createFaucetService } from "@latticexyz/services/faucet";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
-import { createBurnerAccount, transportObserver, ContractWrite } from "@latticexyz/common";
+import { createBurnerAccount, transportObserver, ContractWrite, resourceToHex } from "@latticexyz/common";
 import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
 import { Subject, share } from "rxjs";
 
@@ -31,6 +31,7 @@ import { Subject, share } from "rxjs";
  * for the source of this information.
  */
 import mudConfig from "contracts/mud.config";
+import { delegationWithSignatureTypes } from "./delegationWithSignatureTypes";
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
@@ -127,5 +128,31 @@ export async function setupNetwork() {
     waitForTransaction,
     worldContract,
     write$: write$.asObservable().pipe(share()),
+    generateDelegationSignature: async () => {
+      // Declare delegation parameters
+      const delegatee = "0x7203e7ADfDF38519e1ff4f8Da7DCdC969371f377";
+      const delegationControlId = resourceToHex({ type: "system", namespace: "", name: "unlimited" });
+      const initCallData = "0x";
+      const nonce = 0n;
+
+      // Sign registration message
+      const signature = await burnerWalletClient.signTypedData({
+        domain: {
+          chainId: burnerWalletClient.chain.id,
+          verifyingContract: worldContract.address,
+        },
+        types: delegationWithSignatureTypes,
+        primaryType: "Delegation",
+        message: {
+          delegatee,
+          delegationControlId,
+          initCallData,
+          delegator: burnerWalletClient.account.address,
+          nonce,
+        },
+      });
+
+      return signature;
+    },
   };
 }
