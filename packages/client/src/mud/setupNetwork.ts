@@ -13,6 +13,10 @@ import {
   parseEther,
   ClientConfig,
   getContract,
+  WalletClient,
+  Transport,
+  Chain,
+  Account,
 } from "viem";
 import { createFaucetService } from "@latticexyz/services/faucet";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
@@ -128,7 +132,7 @@ export async function setupNetwork() {
     waitForTransaction,
     worldContract,
     write$: write$.asObservable().pipe(share()),
-    generateDelegationSignature: async () => {
+    generateDelegationSignature: async (walletClient: WalletClient<Transport, Chain, Account>) => {
       // Declare delegation parameters
       const delegatee = "0x7203e7ADfDF38519e1ff4f8Da7DCdC969371f377";
       const delegationControlId = resourceToHex({ type: "system", namespace: "", name: "unlimited" });
@@ -136,9 +140,9 @@ export async function setupNetwork() {
       const nonce = 0n;
 
       // Sign registration message
-      const signature = await burnerWalletClient.signTypedData({
+      const signature = await walletClient.signTypedData({
         domain: {
-          chainId: burnerWalletClient.chain.id,
+          chainId: networkConfig.chain.id,
           verifyingContract: worldContract.address,
         },
         types: delegationWithSignatureTypes,
@@ -147,7 +151,7 @@ export async function setupNetwork() {
           delegatee,
           delegationControlId,
           initCallData,
-          delegator: burnerWalletClient.account.address,
+          delegator: walletClient.account.address,
           nonce,
         },
       });

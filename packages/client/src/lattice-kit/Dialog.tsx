@@ -1,15 +1,23 @@
 import { useEffect, useState } from "react";
-import { Box, Flex, Text, Button, Dialog, Tabs } from "@radix-ui/themes";
+import { Flex, Text, Button, Dialog, Tabs } from "@radix-ui/themes";
 import { useAccount } from "wagmi";
+import { useWalletClient } from "wagmi";
+import { useMUD } from "../MUDContext";
 
 type FlowState = "signer" | "balance" | "delegate" | "play";
 
 const LatticeKitDialog = () => {
+  const {
+    network: { generateDelegationSignature },
+  } = useMUD();
+
   const [activeTab, setActiveTab] = useState<FlowState>("signer");
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
   const account = useAccount();
   const isConnected = account?.isConnected;
+
+  const result = useWalletClient();
 
   useEffect(() => {
     if (isConnected && !shown) {
@@ -101,6 +109,10 @@ const LatticeKitDialog = () => {
               <Dialog.Close>
                 <Button
                   onClick={() => {
+                    if (result.data) {
+                      generateDelegationSignature(result.data);
+                    }
+
                     setActiveTab("play");
                   }}
                 >
