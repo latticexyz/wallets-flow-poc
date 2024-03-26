@@ -12,6 +12,7 @@ import { createSystemCalls } from "./mud/createSystemCalls";
 import { setupBurnerSigner } from "./mud/setupBurnerSigner";
 import { setupNetwork, SetupNetworkResult } from "./mud/setupNetwork";
 import { getNetworkConfig } from "./mud/getNetworkConfig";
+import { useMUDStore } from "./mud/mudStore";
 
 type MUDContextValue = {
   network?: SetupNetworkResult;
@@ -30,6 +31,7 @@ export const MUDProvider = ({ children }: Props) => {
   const [value, setValue] = useState<MUDContextValue | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const account = useAccount();
+  const store = useMUDStore();
 
   useEffect(() => {
     const initSetup = async () => {
@@ -74,15 +76,19 @@ export const MUDProvider = ({ children }: Props) => {
         systemCalls,
       });
 
+      store.setWalletClient(burnerWalletClient);
+      store.setWorldContract(worldContract);
+      store.setSystemCalls(systemCalls);
+
       setLoading(false);
     };
 
-    if (account?.isConnected && value?.network && value?.systemCalls == null) {
+    if (account?.isConnected && value?.network && value?.systemCalls == null && store.worldContract == null && store.systemCalls == null) {
+      console.log('create wallet');
       createWallet();
     }
-  }, [account, value]);
+  }, [account, value, store]);
 
-  // TODO: figure out how to handle loading state better
   return (
     <MUDContext.Provider value={value}>
       {/* TODO: handle loading states */}

@@ -1,6 +1,7 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useMUD } from "./MUDContext";
 import LatticeKitDialog from "./lattice-kit/Dialog";
+import { useMUDStore } from "./mud/mudStore";
 
 const styleUnset = { all: "unset" } as const;
 
@@ -12,13 +13,10 @@ const styleUnset = { all: "unset" } as const;
 // }
 
 export const App = () => {
-  // TODO: walletClient - walletClient - app-signer
   const {
-    network: { tables, useStore }, // , walletClient, worldContract
-    // systemCalls: { addTask, toggleTask, deleteTask },
+    network: { tables, useStore },
   } = useMUD();
-
-  const { systemCalls } = useMUD();
+  const { systemCalls } = useMUDStore();
   const addTask = systemCalls?.addTask;
   const toggleTask = systemCalls?.toggleTask;
   const deleteTask = systemCalls?.deleteTask;
