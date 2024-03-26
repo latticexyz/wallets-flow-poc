@@ -1,4 +1,4 @@
-import { create, UseBoundStore, StoreApi } from "zustand";
+import { create } from "zustand";
 import { SetupNetworkResult } from "./setupNetwork";
 import { WalletClient } from "viem";
 import { SystemCalls } from "./createSystemCalls";
@@ -7,14 +7,14 @@ type SetState = (state: MUDState) => void;
 
 export type MUDState =
   | {
-      state: "loading";
+      status: "loading";
     }
   | {
-      state: "read";
+      status: "read";
       network: SetupNetworkResult;
     }
   | {
-      state: "write";
+      status: "write";
       network: SetupNetworkResult;
       walletClient: WalletClient;
       systemCalls: SystemCalls;
@@ -22,11 +22,11 @@ export type MUDState =
     };
 
 export const useMUDStore = create<MUDState & { set: SetState }>((set) => ({
-  state: "loading",
+  status: "loading",
   set,
 }));
 
-export function useMUD(): MUDState & { state: "read" | "write" };
+export function useMUD(): MUDState & { status: "read" | "write" };
 export function useMUD<T>(
   selector?: (
     state: MUDState & {
@@ -34,7 +34,7 @@ export function useMUD<T>(
     },
   ) => T,
 ) {
-  const status = useMUDStore((store) => store.state);
+  const status = useMUDStore((store) => store.status);
   if (status === "loading") {
     throw new Error("Accessing MUD context before loading is done. Are you using MUDProvider?");
   }

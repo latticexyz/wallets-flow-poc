@@ -18,7 +18,7 @@ export function useSetup() {
     const initSetup = async () => {
       try {
         const network: SetupNetworkResult = await setupNetwork();
-        store.set({ state: "read", network });
+        store.set({ status: "read", network });
       } catch (error) {
         console.log("Error setting up MUD client", error);
       }
@@ -29,12 +29,12 @@ export function useSetup() {
 
   useEffect(() => {
     const createWallet = async () => {
-      if (store.state === "loading") {
+      if (store.status === "loading") {
         console.warn("Can not setup wallet before initial setup is done");
         return;
       }
 
-      if (store.state === "write") {
+      if (store.status === "write") {
         console.warn("Wallet is already set up");
         return;
       }
@@ -58,7 +58,7 @@ export function useSetup() {
       });
       const systemCalls = createSystemCalls(network, worldContract);
 
-      store.set({ state: "write", walletClient: burnerWalletClient, worldContract, systemCalls, network });
+      store.set({ status: "write", walletClient: burnerWalletClient, worldContract, systemCalls, network });
 
       setupDevTools(network, burnerWalletClient, worldContract);
     };

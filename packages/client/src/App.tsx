@@ -1,19 +1,16 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import LatticeKitDialog from "./lattice-kit/Dialog";
-import { MUDState, useMUD, useMUDStore } from "./mud/mudStore";
-import { useSetup } from "./mud/useSetup";
+import { useMUD } from "./mud/mudStore";
+import { Hex } from "viem";
 
 const styleUnset = { all: "unset" } as const;
 
-// type Wallet = {
-//   connected: false,
-// } | {
-//   connected: true,
-//   walletClient: WalletClient
-// }
-
 export const App = () => {
-  const status = useMUD();
+  const state = useMUD();
+
+  const {
+    network: { useStore, tables },
+  } = state;
 
   const tasks = useStore((state) => {
     const records = Object.values(state.getRecords(tables.Tasks));
@@ -21,13 +18,28 @@ export const App = () => {
     return records;
   });
 
-  const status = useMUDStore((state) => state.state);
+  function handleToggle(id: Hex) {
+    if (state.status === "write") {
+      return state.systemCalls.toggleTask(id);
+    }
+  }
+
+  function handleDelete(id: Hex) {
+    if (state.status === "write") {
+      return state.systemCalls.deleteTask(id);
+    }
+  }
+
+  function handleAdd(id: string) {
+    if (state.status === "write") {
+      return state.systemCalls.addTask(id);
+    }
+  }
 
   return (
     <>
       <ConnectButton />
       <LatticeKitDialog />
-      {status === "write" && <TodoList />}
 
       <table>
         <tbody>
@@ -44,7 +56,7 @@ export const App = () => {
 
                     checkbox.disabled = true;
                     try {
-                      await toggleTask(task.key.id);
+                      await handleToggle(task.key.id);
                     } finally {
                       checkbox.disabled = false;
                     }
@@ -64,7 +76,7 @@ export const App = () => {
                     const button = event.currentTarget;
                     button.disabled = true;
                     try {
-                      await deleteTask(task.key.id);
+                      await handleDelete(task.key.id);
                     } finally {
                       button.disabled = false;
                     }
@@ -95,7 +107,7 @@ export const App = () => {
 
                   fieldset.disabled = true;
                   try {
-                    await addTask(desc);
+                    await handleAdd(desc);
                     form.reset();
                   } finally {
                     fieldset.disabled = false;
@@ -115,23 +127,4 @@ export const App = () => {
       </table>
     </>
   );
-};
-
-const TodoList = () => {
-  const {
-    network: { useStore },
-  } = useMUDStore((state) => {
-    if (state.state === "loading") {
-      throw Error();
-    }
-    return state;
-  });
-
-  const tasks = useStore((state) => {
-    const records = Object.values(state.getRecords(tables.Tasks));
-    records.sort((a, b) => Number(a.value.createdAt - b.value.createdAt));
-    return records;
-  });
-
-  return <></>;
 };
