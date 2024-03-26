@@ -1,10 +1,4 @@
-import {
-  createContext,
-  ReactNode,
-  useState,
-  useEffect,
-  useContext,
-} from "react";
+import { createContext, ReactNode, useState, useEffect, useContext } from "react";
 import { setup, SetupResult } from "./mud/setup";
 
 const MUDContext = createContext<SetupResult | null>(null);
