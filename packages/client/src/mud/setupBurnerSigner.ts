@@ -1,20 +1,14 @@
 import { Hex } from "viem";
-import { Subject } from "rxjs";
 import { createWalletClient } from "viem";
 import { getNetworkConfig } from "./getNetworkConfig";
-import { createBurnerAccount, ContractWrite } from "@latticexyz/common";
+import { createBurnerAccount } from "@latticexyz/common";
 import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
 import { getClientOptions } from "./getClientOptions";
+import { SetupNetworkResult } from "./setupNetwork";
 
-export async function setupBurnerSigner() {
+export async function setupBurnerSigner(network: SetupNetworkResult) {
   const networkConfig = await getNetworkConfig();
   const clientOptions = getClientOptions(networkConfig);
-
-  /*
-   * Create an observable for contract writes that we can
-   * pass into MUD dev tools for transaction observability.
-   */
-  const write$ = new Subject<ContractWrite>();
 
   // TODO: derive burner signer here
   /*
@@ -27,7 +21,7 @@ export async function setupBurnerSigner() {
     account: burnerAccount,
   })
     .extend(transactionQueue())
-    .extend(writeObserver({ onWrite: (write) => write$.next(write) }));
+    .extend(writeObserver({ onWrite: (write) => network.write$.next(write) }));
 
   return burnerWalletClient;
 }

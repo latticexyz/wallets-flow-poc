@@ -8,6 +8,7 @@ import { setupNetwork, SetupNetworkResult } from "./mud/setupNetwork";
 import { getNetworkConfig } from "./mud/getNetworkConfig";
 import { useMUDStore } from "./mud/mudStore";
 import { initFaucetService } from "./mud/initFaucetService";
+import { setupDevTools } from "./mud/setupDevTools";
 
 type MUDContextValue = {
   network?: SetupNetworkResult;
@@ -43,13 +44,12 @@ export const MUDProvider = ({ children }: Props) => {
 
   useEffect(() => {
     const createWallet = async () => {
-      const burnerWalletClient = await setupBurnerSigner();
-
       /*
        * Create an object for communicating with the deployed World.
        */
       const networkConfig = await getNetworkConfig();
       const network = store.network as SetupNetworkResult;
+      const burnerWalletClient = await setupBurnerSigner(network);
      
       await initFaucetService(burnerWalletClient, network, networkConfig);
 
@@ -66,6 +66,8 @@ export const MUDProvider = ({ children }: Props) => {
       store.setWalletClient(burnerWalletClient);
       store.setWorldContract(worldContract);
       store.setSystemCalls(systemCalls);
+
+      setupDevTools(network, burnerWalletClient, worldContract);
 
       setLoading(false);
     };

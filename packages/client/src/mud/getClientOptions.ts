@@ -3,7 +3,7 @@ import { transportObserver } from "@latticexyz/common";
 import { NetworkConfig } from "./getNetworkConfig";
 
 // TODO: cache?
-export const getClientOptions = (networkConfig: NetworkConfig): ClientConfig => {
+export const getClientOptions = (networkConfig: NetworkConfig) => {
   const clientOptions = {
     chain: networkConfig.chain,
     transport: transportObserver(fallback([webSocket(), http()])),

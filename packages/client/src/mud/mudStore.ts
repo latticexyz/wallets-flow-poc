@@ -28,5 +28,5 @@ export const useMUDStore = create<MUDState>((set) => ({
   setSystemCalls: (systemCalls: SystemCalls) => set({ systemCalls }),
 
   worldContract: null,
-  setWorldContract: (worldContract) => set({ worldContract }),
+  setWorldContract: (worldContract: any) => set({ worldContract }),
 }));

@@ -3,6 +3,7 @@
  * (https://viem.sh/docs/getting-started.html).
  * This line imports the functions we need from it.
  */
+import { Subject } from "rxjs";
 import { createPublicClient, Hex } from "viem";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
@@ -17,6 +18,7 @@ import { getNetworkConfig } from "./getNetworkConfig";
  */
 import mudConfig from "contracts/mud.config";
 import { getClientOptions } from "./getClientOptions";
+import { ContractWrite } from "@latticexyz/common";
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
@@ -29,6 +31,11 @@ export async function setupNetwork() {
    */
   const clientOptions = getClientOptions(networkConfig);
   const publicClient = createPublicClient(clientOptions);
+  /*
+   * Create an observable for contract writes that we can
+   * pass into MUD dev tools for transaction observability.
+   */
+  const write$ = new Subject<ContractWrite>();
 
   /*
    * Sync on-chain state into RECS and keeps our client in sync.
@@ -50,6 +57,7 @@ export async function setupNetwork() {
   });
 
   return {
+    write$,
     tables,
     useStore,
     publicClient,
