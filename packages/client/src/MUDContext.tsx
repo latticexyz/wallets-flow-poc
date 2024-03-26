@@ -37,15 +37,9 @@ export const MUDProvider = ({ children }: Props) => {
     const initSetup = async () => {
       try {
         const network: SetupNetworkResult = await setupNetwork();
-        setValue({
-          ...value,
-          network,
-        });
+        store.setNetwork(network);
       } catch (error) {
         console.log("Error setting up MUD client", error);
-      } finally {
-        // TODO:
-        // setLoading(false);
       }
     };
 
@@ -60,7 +54,7 @@ export const MUDProvider = ({ children }: Props) => {
        * Create an object for communicating with the deployed World.
        */
       const networkConfig = await getNetworkConfig();
-      const network = value?.network as SetupNetworkResult;
+      const network = store.network as SetupNetworkResult;
       const worldContract = getContract({
         address: networkConfig.worldAddress as Hex,
         abi: IWorldAbi,
@@ -71,11 +65,6 @@ export const MUDProvider = ({ children }: Props) => {
       });
       const systemCalls = createSystemCalls(network, worldContract);
 
-      setValue({
-        ...value,
-        systemCalls,
-      });
-
       store.setWalletClient(burnerWalletClient);
       store.setWorldContract(worldContract);
       store.setSystemCalls(systemCalls);
@@ -83,8 +72,12 @@ export const MUDProvider = ({ children }: Props) => {
       setLoading(false);
     };
 
-    if (account?.isConnected && value?.network && value?.systemCalls == null && store.worldContract == null && store.systemCalls == null) {
-      console.log('create wallet');
+    if (
+      account?.isConnected &&
+      store.network != null &&
+      store.worldContract == null &&
+      store.systemCalls == null
+    ) {
       createWallet();
     }
   }, [account, value, store]);
@@ -98,8 +91,3 @@ export const MUDProvider = ({ children }: Props) => {
   );
 };
 
-export const useMUD = () => {
-  const value = useContext(MUDContext);
-  if (!value) throw new Error("Must be used within a MUDProvider");
-  return value;
-};

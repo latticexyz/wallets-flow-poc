@@ -3,7 +3,6 @@ import { transportObserver } from "@latticexyz/common";
 import { NetworkConfig } from "./getNetworkConfig";
 
 // TODO: cache?
-// TODO: why TS error?
 export const getClientOptions = (networkConfig: NetworkConfig): ClientConfig => {
   const clientOptions = {
     chain: networkConfig.chain,
