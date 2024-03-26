@@ -105,6 +105,9 @@ importers:
       contracts:
         specifier: workspace:*
         version: link:../contracts
+      permissionless:
+        specifier: ^0.1.10
+        version: 0.1.10(viem@2.7.12)
       react:
         specifier: ^18.2.0
         version: 18.2.0
@@ -9046,6 +9049,14 @@ packages:
 
   /pathe@1.1.2:
     resolution: {integrity: sha512-whLdWMYL2TwI08hn8/ZqAbrVemu0LNaNNJZX73O6qaIdCTfXutsLhMkjdENX0qhsQ9uIimo4/aQOmXkoon2nDQ==}
+    dev: false
+
+  /permissionless@0.1.10(viem@2.7.12):
+    resolution: {integrity: sha512-LVjGVLRfARHhuWSktiO5wd2tA0iTzP+Se8oDKRVyzb5Z/X4jCL+3hqWJMeERkjn3bOK0al2cv55sIABFOo+XKg==}
+    peerDependencies:
+      viem: ^2.0.0
+    dependencies:
+      viem: 2.7.12(typescript@5.4.2)(zod@3.22.4)
     dev: false
 
   /picocolors@1.0.0:

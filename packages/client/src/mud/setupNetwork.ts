@@ -8,24 +8,26 @@ import {
   fallback,
   webSocket,
   http,
-  createWalletClient,
   Hex,
-  parseEther,
   ClientConfig,
   getContract,
+  PrivateKeyAccount,
+  parseEther,
+  Address,
+  Chain,
+  createWalletClient,
 } from "viem";
-import { createFaucetService } from "@latticexyz/services/faucet";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
-import {
-  createBurnerAccount,
-  transportObserver,
-  ContractWrite,
-} from "@latticexyz/common";
+import { createBurnerAccount, transportObserver, ContractWrite } from "@latticexyz/common";
 import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
-import { callFrom } from "@latticexyz/world/internal";
+// import { callFrom } from "@latticexyz/world/internal";
 import { Subject, share } from "rxjs";
+import { ENTRYPOINT_ADDRESS_V07, createSmartAccountClient } from "permissionless";
+import { signerToSimpleSmartAccount } from "permissionless/accounts";
+import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
+import { call, getTransactionCount } from "viem/actions";
 
 /*
  * Import our MUD config, which includes strong types for
@@ -36,6 +38,8 @@ import { Subject, share } from "rxjs";
  * for the source of this information.
  */
 import mudConfig from "contracts/mud.config";
+import { mnemonicToAccount } from "viem/accounts";
+import { foundry } from "viem/chains";
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
@@ -60,28 +64,68 @@ export async function setupNetwork() {
    */
   const write$ = new Subject<ContractWrite>();
 
-  /*
-   * Create a temporary wallet and a viem client for it
-   * (see https://viem.sh/docs/clients/wallet.html).
-   */
-  const burnerAccount = createBurnerAccount(networkConfig.privateKey as Hex);
-  const burnerWalletClient = createWalletClient({
-    ...clientOptions,
-    account: burnerAccount,
+  const pimlicoBundlerClient = createPimlicoBundlerClient({
+    chain: clientOptions.chain,
+    transport: http("http://127.0.0.1:4337"),
+    entryPoint: ENTRYPOINT_ADDRESS_V07,
+  });
+
+  const appSigner = createBurnerAccount(networkConfig.privateKey as Hex) as PrivateKeyAccount;
+
+  const appSmartAccount = await signerToSimpleSmartAccount(publicClient, {
+    entryPoint: ENTRYPOINT_ADDRESS_V07,
+    factoryAddress: "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
+    signer: appSigner,
+  });
+
+  const appSmartAccountClient = createSmartAccountClient({
+    chain: clientOptions.chain,
+    bundlerTransport: http("http://127.0.0.1:4337"),
+    middleware: {
+      gasPrice: async () => (await pimlicoBundlerClient.getUserOperationGasPrice()).fast, // use pimlico bundler to get gas prices
+    },
+    account: appSmartAccount,
   })
-    .extend(transactionQueue())
-    .extend(writeObserver({ onWrite: (write) => write$.next(write) }))
-    .extend(
-      callFrom({
-        worldAddress: networkConfig.worldAddress,
-        // TODO: how can we get access to the main wallet here?
-        // Maybe setting up the `wallet client` should be somehow separate from the initial network setup,
-        // since it depends on the main user wallet being connected.
-        // Also, what if the user changes their main wallet? How do we update the burner wallet?
-        delegatorAddress: "0x4f4ddafbc93cf8d11a253f21ddbcf836139efdec",
-        publicClient,
-      })
-    );
+    .extend(() => ({
+      getTransactionCount: (args) => {
+        console.log("getTransactionCount, ", args);
+        return getTransactionCount(publicClient, args);
+      },
+      call: (args) => call(publicClient, args),
+    }))
+    .extend(transactionQueue(publicClient))
+    .extend(writeObserver({ onWrite: (write) => write$.next(write) }));
+  // .extend(
+  //   callFrom({
+  //     worldAddress: networkConfig.worldAddress,
+  //     // TODO: how can we get access to the main wallet here?
+  //     // Maybe setting up the `wallet client` should be somehow separate from the initial network setup,
+  //     // since it depends on the main user wallet being connected.
+  //     // Also, what if the user changes their main wallet? How do we update the burner wallet?
+  //     delegatorAddress: "0x4f4ddafbc93cf8d11a253f21ddbcf836139efdec",
+  //     publicClient,
+  //   }),
+  // );
+
+  ////////////////////
+  // JUST IN DEV
+  async function seedAccount(to: Address, chain: Chain) {
+    const account = mnemonicToAccount("test test test test test test test test test test test junk");
+
+    const walletClient = createWalletClient({
+      account,
+      chain,
+      transport: http("http://localhost:8545"),
+    });
+
+    await walletClient.sendTransaction({
+      to,
+      value: parseEther("5"),
+    });
+  }
+
+  await seedAccount(appSmartAccount.address, foundry);
+  ///////////////////
 
   /*
    * Create an object for communicating with the deployed World.
@@ -89,7 +133,7 @@ export async function setupNetwork() {
   const worldContract = getContract({
     address: networkConfig.worldAddress as Hex,
     abi: IWorldAbi,
-    client: { public: publicClient, wallet: burnerWalletClient },
+    client: { public: publicClient, wallet: appSmartAccountClient },
   });
 
   /*
@@ -98,52 +142,18 @@ export async function setupNetwork() {
    * to the viem publicClient to make RPC calls to fetch MUD
    * events from the chain.
    */
-  const {
-    tables,
-    useStore,
-    latestBlock$,
-    storedBlockLogs$,
-    waitForTransaction,
-  } = await syncToZustand({
+  const { tables, useStore, latestBlock$, storedBlockLogs$, waitForTransaction } = await syncToZustand({
     config: mudConfig,
     address: networkConfig.worldAddress as Hex,
     publicClient,
     startBlock: BigInt(networkConfig.initialBlockNumber),
   });
 
-  /*
-   * If there is a faucet, request (test) ETH if you have
-   * less than 1 ETH. Repeat every 20 seconds to ensure you don't
-   * run out.
-   */
-  if (networkConfig.faucetServiceUrl) {
-    const address = burnerAccount.address;
-    console.info("[Dev Faucet]: Player address -> ", address);
-
-    const faucet = createFaucetService(networkConfig.faucetServiceUrl);
-
-    const requestDrip = async () => {
-      const balance = await publicClient.getBalance({ address });
-      console.info(`[Dev Faucet]: Player balance -> ${balance}`);
-      const lowBalance = balance < parseEther("1");
-      if (lowBalance) {
-        console.info("[Dev Faucet]: Balance is low, dripping funds to player");
-        // Double drip
-        await faucet.dripDev({ address });
-        await faucet.dripDev({ address });
-      }
-    };
-
-    requestDrip();
-    // Request a drip every 20 seconds
-    setInterval(requestDrip, 20000);
-  }
-
   return {
     tables,
     useStore,
     publicClient,
-    walletClient: burnerWalletClient,
+    walletClient: appSmartAccountClient,
     latestBlock$,
     storedBlockLogs$,
     waitForTransaction,
