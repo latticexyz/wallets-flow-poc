@@ -25,7 +25,7 @@ export const useMUDStore = create<MUDState>((set) => ({
   setWalletClient: (walletClient: WalletClient) => set({ walletClient }),
 
   systemCalls: null,
-  setSystemCalls: (systemCalls) => set({ systemCalls }),
+  setSystemCalls: (systemCalls: SystemCalls) => set({ systemCalls }),
 
   worldContract: null,
   setWorldContract: (worldContract) => set({ worldContract }),
