@@ -36,5 +36,5 @@ root.render(
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>
-  </Theme>
+  </Theme>,
 );

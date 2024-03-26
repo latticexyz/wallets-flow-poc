@@ -1,10 +1,4 @@
-import {
-  createContext,
-  ReactNode,
-  useState,
-  useEffect,
-  useContext,
-} from "react";
+import { createContext, ReactNode, useState, useEffect } from "react";
 import { useAccount } from "wagmi";
 import { Hex, getContract } from "viem";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
@@ -72,12 +66,7 @@ export const MUDProvider = ({ children }: Props) => {
       setLoading(false);
     };
 
-    if (
-      account?.isConnected &&
-      store.network != null &&
-      store.worldContract == null &&
-      store.systemCalls == null
-    ) {
+    if (account?.isConnected && store.network != null && store.worldContract == null && store.systemCalls == null) {
       createWallet();
     }
   }, [account, value, store]);
@@ -90,4 +79,3 @@ export const MUDProvider = ({ children }: Props) => {
     </MUDContext.Provider>
   );
 };
-
