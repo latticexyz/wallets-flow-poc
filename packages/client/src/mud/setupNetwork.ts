@@ -3,31 +3,19 @@
  * (https://viem.sh/docs/getting-started.html).
  * This line imports the functions we need from it.
  */
-import {
-  createPublicClient,
-  fallback,
-  webSocket,
-  http,
-  Hex,
-  ClientConfig,
-  getContract,
-  PrivateKeyAccount,
-  parseEther,
-  Address,
-  Chain,
-  createWalletClient,
-} from "viem";
+import { createPublicClient, fallback, webSocket, http, Hex, ClientConfig, getContract, PrivateKeyAccount } from "viem";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
 import { createBurnerAccount, transportObserver, ContractWrite } from "@latticexyz/common";
 import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
-// import { callFrom } from "@latticexyz/world/internal";
+import { callFrom } from "@latticexyz/world/internal";
 import { Subject, share } from "rxjs";
 import { ENTRYPOINT_ADDRESS_V07, createSmartAccountClient } from "permissionless";
 import { signerToSimpleSmartAccount } from "permissionless/accounts";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { call, getTransactionCount } from "viem/actions";
+import { MOCK_PAYMASTER_ADDRESS } from "../../../account-abstraction/src/deployPaymaster";
 
 /*
  * Import our MUD config, which includes strong types for
@@ -38,8 +26,6 @@ import { call, getTransactionCount } from "viem/actions";
  * for the source of this information.
  */
 import mudConfig from "contracts/mud.config";
-import { mnemonicToAccount } from "viem/accounts";
-import { foundry } from "viem/chains";
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
@@ -82,6 +68,21 @@ export async function setupNetwork() {
     chain: clientOptions.chain,
     bundlerTransport: http("http://127.0.0.1:4337"),
     middleware: {
+      sponsorUserOperation: async ({ userOperation }) => {
+        const gasEstimates = await pimlicoBundlerClient.estimateUserOperationGas({
+          userOperation: {
+            ...userOperation,
+            paymaster: MOCK_PAYMASTER_ADDRESS,
+            paymasterData: "0x",
+          },
+        });
+
+        return {
+          paymasterData: "0x",
+          paymaster: MOCK_PAYMASTER_ADDRESS,
+          ...gasEstimates,
+        };
+      },
       gasPrice: async () => (await pimlicoBundlerClient.getUserOperationGasPrice()).fast, // use pimlico bundler to get gas prices
     },
     account: appSmartAccount,
@@ -93,39 +94,19 @@ export async function setupNetwork() {
       },
       call: (args) => call(publicClient, args),
     }))
-    .extend(transactionQueue(publicClient))
-    .extend(writeObserver({ onWrite: (write) => write$.next(write) }));
-  // .extend(
-  //   callFrom({
-  //     worldAddress: networkConfig.worldAddress,
-  //     // TODO: how can we get access to the main wallet here?
-  //     // Maybe setting up the `wallet client` should be somehow separate from the initial network setup,
-  //     // since it depends on the main user wallet being connected.
-  //     // Also, what if the user changes their main wallet? How do we update the burner wallet?
-  //     delegatorAddress: "0x4f4ddafbc93cf8d11a253f21ddbcf836139efdec",
-  //     publicClient,
-  //   }),
-  // );
-
-  ////////////////////
-  // JUST IN DEV
-  async function seedAccount(to: Address, chain: Chain) {
-    const account = mnemonicToAccount("test test test test test test test test test test test junk");
-
-    const walletClient = createWalletClient({
-      account,
-      chain,
-      transport: http("http://localhost:8545"),
-    });
-
-    await walletClient.sendTransaction({
-      to,
-      value: parseEther("5"),
-    });
-  }
-
-  await seedAccount(appSmartAccount.address, foundry);
-  ///////////////////
+    // .extend(transactionQueue(publicClient))
+    .extend(writeObserver({ onWrite: (write) => write$.next(write) }))
+    .extend(
+      callFrom({
+        worldAddress: networkConfig.worldAddress,
+        // TODO: how can we get access to the main wallet here?
+        // Maybe setting up the `wallet client` should be somehow separate from the initial network setup,
+        // since it depends on the main user wallet being connected.
+        // Also, what if the user changes their main wallet? How do we update the burner wallet?
+        delegatorAddress: "0x4f4ddafbc93cf8d11a253f21ddbcf836139efdec",
+        publicClient,
+      }),
+    );
 
   /*
    * Create an object for communicating with the deployed World.
