@@ -18,6 +18,7 @@ export type MUDState =
       status: "write";
       network: SetupNetworkResult;
       walletClient: WalletClient;
+      smartAccountWalletClient: WalletClient;
       systemCalls: SystemCalls;
       utilsCalls: UtilsCalls;
       worldContract: any;

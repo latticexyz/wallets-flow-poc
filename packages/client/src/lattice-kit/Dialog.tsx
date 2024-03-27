@@ -9,6 +9,8 @@ type FlowState = "signer" | "balance" | "delegate" | "play";
 const LatticeKitDialog = () => {
   const {
     utilsCalls: { registerUnlimitedDelegationWithSignatureNow }, // TODO: TS
+    // network: { walletClient: walletClientResult },
+    smartAccountWalletClient,
   } = useMUD();
   const [activeTab, setActiveTab] = useState<FlowState>("signer");
   const [open, setOpen] = useState(false);
@@ -107,11 +109,18 @@ const LatticeKitDialog = () => {
               <Dialog.Close>
                 <Button
                   onClick={() => {
+                    console.log("walletClientResult", walletClientResult);
+
                     if (walletClientResult.data) {
                       // Declare a random delegatee
-                      const delegatee = "0x7203e7ADfDF38519e1ff4f8Da7DCdC969371f377";
+                      // const delegatee = "0x7203e7ADfDF38519e1ff4f8Da7DCdC969371f377";
+                      const delegatee = smartAccountWalletClient.account.address;
 
-                      registerUnlimitedDelegationWithSignatureNow(walletClientResult.data, delegatee);
+                      registerUnlimitedDelegationWithSignatureNow(
+                        walletClientResult.data,
+                        smartAccountWalletClient,
+                        delegatee,
+                      );
                     }
 
                     setActiveTab("play");
