@@ -24,6 +24,7 @@ import { getNetworkConfig } from "./getNetworkConfig";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
 import { createBurnerAccount, transportObserver, ContractWrite, resourceToHex } from "@latticexyz/common";
 import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
+import { delegationWithSignatureTypes } from "@latticexyz/world/internal";
 import { Subject, share } from "rxjs";
 
 /*
@@ -35,7 +36,6 @@ import { Subject, share } from "rxjs";
  * for the source of this information.
  */
 import mudConfig from "contracts/mud.config";
-import { delegationWithSignatureTypes } from "./delegationWithSignatureTypes";
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
