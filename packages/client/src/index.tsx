@@ -30,7 +30,7 @@ root.render(
     <WagmiProvider config={config}>
       <QueryClientProvider client={client}>
         <RainbowKitProvider>
-          <MUDProvider>
+          <MUDProvider loadingComponent={<>Loading</>}>
             <App />
           </MUDProvider>
         </RainbowKitProvider>

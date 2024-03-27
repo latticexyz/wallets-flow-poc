@@ -3,27 +3,13 @@
  * (https://viem.sh/docs/getting-started.html).
  * This line imports the functions we need from it.
  */
-import {
-  createPublicClient,
-  fallback,
-  webSocket,
-  http,
-  Hex,
-  ClientConfig,
-  getContract,
-  PrivateKeyAccount,
-  parseEther,
-  Address,
-  Chain,
-  createWalletClient,
-} from "viem";
+import { createPublicClient, http, Hex, PrivateKeyAccount, parseEther, Address, Chain, createWalletClient } from "viem";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
-import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
-import { createBurnerAccount, transportObserver, ContractWrite } from "@latticexyz/common";
+import { createBurnerAccount, ContractWrite } from "@latticexyz/common";
 import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
 // import { callFrom } from "@latticexyz/world/internal";
-import { Subject, share } from "rxjs";
+import { Subject } from "rxjs";
 import { ENTRYPOINT_ADDRESS_V07, createSmartAccountClient } from "permissionless";
 import { signerToSimpleSmartAccount } from "permissionless/accounts";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
@@ -40,6 +26,7 @@ import { call, getTransactionCount } from "viem/actions";
 import mudConfig from "contracts/mud.config";
 import { mnemonicToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";
+import { getClientOptions } from "./getClientOptions";
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
@@ -50,14 +37,8 @@ export async function setupNetwork() {
    * Create a viem public (read only) client
    * (https://viem.sh/docs/clients/public.html)
    */
-  const clientOptions = {
-    chain: networkConfig.chain,
-    transport: transportObserver(fallback([webSocket(), http()])),
-    pollingInterval: 1000,
-  } as const satisfies ClientConfig;
-
+  const clientOptions = getClientOptions(networkConfig);
   const publicClient = createPublicClient(clientOptions);
-
   /*
    * Create an observable for contract writes that we can
    * pass into MUD dev tools for transaction observability.
@@ -128,15 +109,6 @@ export async function setupNetwork() {
   ///////////////////
 
   /*
-   * Create an object for communicating with the deployed World.
-   */
-  const worldContract = getContract({
-    address: networkConfig.worldAddress as Hex,
-    abi: IWorldAbi,
-    client: { public: publicClient, wallet: appSmartAccountClient },
-  });
-
-  /*
    * Sync on-chain state into RECS and keeps our client in sync.
    * Uses the MUD indexer if available, otherwise falls back
    * to the viem publicClient to make RPC calls to fetch MUD
@@ -150,6 +122,7 @@ export async function setupNetwork() {
   });
 
   return {
+    write$,
     tables,
     useStore,
     publicClient,
@@ -157,7 +130,5 @@ export async function setupNetwork() {
     latestBlock$,
     storedBlockLogs$,
     waitForTransaction,
-    worldContract,
-    write$: write$.asObservable().pipe(share()),
   };
 }
