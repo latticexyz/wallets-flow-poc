@@ -48,7 +48,8 @@ export function useSetup() {
       const network = store.network as SetupNetworkResult;
       // const burnerWalletClient = store.network.walletClient;
       // const burnerWalletClient = await setupBurnerSigner(network);
-      const smartAccountWalletClient = await setupSmartAccountClient(networkConfig, network);
+      
+      const smartAccountWalletClient = await setupSmartAccountClient(networkConfig, network, account.address);
       const burnerWalletClient = smartAccountWalletClient; // TODO: remove this line
 
       // await initFaucetService(burnerWalletClient, network, networkConfig);

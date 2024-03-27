@@ -16,7 +16,11 @@ import { mnemonicToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";
 import { getClientOptions } from "./getClientOptions";
 
-export async function setupSmartAccountClient(networkConfig: NetworkConfig, network: SetupNetworkResult) {
+export async function setupSmartAccountClient(
+  networkConfig: NetworkConfig,
+  network: SetupNetworkResult,
+  accountAddress: Address,
+) {
   const clientOptions = getClientOptions(networkConfig);
   const publicClient = network.publicClient;
   const write$ = network.write$;
@@ -62,7 +66,7 @@ export async function setupSmartAccountClient(networkConfig: NetworkConfig, netw
         // Maybe setting up the `wallet client` should be somehow separate from the initial network setup,
         // since it depends on the main user wallet being connected.
         // Also, what if the user changes their main wallet? How do we update the burner wallet?
-        delegatorAddress: "0xB0377E433CA527047A0eFDf89b7199aeE1e85d0E",
+        delegatorAddress: accountAddress,
         publicClient,
       }),
     );
