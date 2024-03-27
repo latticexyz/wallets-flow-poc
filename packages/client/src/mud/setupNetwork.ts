@@ -22,7 +22,7 @@ import { createFaucetService } from "@latticexyz/services/faucet";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
-import { createBurnerAccount, transportObserver, ContractWrite, resourceToHex } from "@latticexyz/common";
+import { createBurnerAccount, transportObserver, ContractWrite } from "@latticexyz/common";
 import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
 import { delegationWithSignatureTypes } from "@latticexyz/world/internal";
 import { Subject, share } from "rxjs";
@@ -38,6 +38,42 @@ import { Subject, share } from "rxjs";
 import mudConfig from "contracts/mud.config";
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
+
+const DelegationAbi = [
+  {
+    type: "function",
+    name: "registerDelegationWithSignature",
+    inputs: [
+      {
+        name: "delegatee",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "delegationControlId",
+        type: "bytes32",
+        internalType: "ResourceId",
+      },
+      {
+        name: "initCallData",
+        type: "bytes",
+        internalType: "bytes",
+      },
+      {
+        name: "delegator",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "signature",
+        type: "bytes",
+        internalType: "bytes",
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+] as const;
 
 export async function setupNetwork() {
   const networkConfig = await getNetworkConfig();
@@ -122,6 +158,30 @@ export async function setupNetwork() {
     setInterval(requestDrip, 20000);
   }
 
+  const signDelegationMessage = (
+    walletClient: WalletClient<Transport, Chain, Account>,
+    delegatee: Hex,
+    delegationControlId: Hex,
+    initCallData: Hex,
+    nonce: bigint,
+  ) => {
+    return walletClient.signTypedData({
+      domain: {
+        chainId: networkConfig.chain.id,
+        verifyingContract: worldContract.address,
+      },
+      types: delegationWithSignatureTypes,
+      primaryType: "Delegation",
+      message: {
+        delegatee,
+        delegationControlId: delegationControlId,
+        initCallData,
+        delegator: walletClient.account.address,
+        nonce,
+      },
+    });
+  };
+
   return {
     tables,
     useStore,
@@ -132,31 +192,23 @@ export async function setupNetwork() {
     waitForTransaction,
     worldContract,
     write$: write$.asObservable().pipe(share()),
-    generateDelegationSignature: async (walletClient: WalletClient<Transport, Chain, Account>) => {
-      // Declare delegation parameters
-      const delegatee = "0x7203e7ADfDF38519e1ff4f8Da7DCdC969371f377";
-      const delegationControlId = resourceToHex({ type: "system", namespace: "", name: "unlimited" });
-      const initCallData = "0x";
-      const nonce = 0n;
-
+    generateDelegationSignature: signDelegationMessage,
+    registerDelegationWithSignature: async (
+      walletClient: WalletClient<Transport, Chain, Account>,
+      delegatee: Hex,
+      delegationControlId: Hex,
+      initCallData: Hex,
+      nonce: bigint,
+    ) => {
       // Sign registration message
-      const signature = await walletClient.signTypedData({
-        domain: {
-          chainId: networkConfig.chain.id,
-          verifyingContract: worldContract.address,
-        },
-        types: delegationWithSignatureTypes,
-        primaryType: "Delegation",
-        message: {
-          delegatee,
-          delegationControlId,
-          initCallData,
-          delegator: walletClient.account.address,
-          nonce,
-        },
-      });
+      const signature = await signDelegationMessage(walletClient, delegatee, delegationControlId, initCallData, nonce);
 
-      return signature;
+      return walletClient.writeContract({
+        address: worldContract.address,
+        abi: DelegationAbi,
+        functionName: "registerDelegationWithSignature",
+        args: [delegatee, delegationControlId, initCallData, walletClient.account.address, signature],
+      });
     },
   };
 }
