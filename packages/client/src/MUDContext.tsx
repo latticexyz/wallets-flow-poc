@@ -1,42 +1,22 @@
-import { createContext, ReactNode, useState, useEffect, useContext } from "react";
-import { setup, SetupResult } from "./mud/setup";
-
-const MUDContext = createContext<SetupResult | null>(null);
+import { ReactNode } from "react";
+import { useMUDStore } from "./mud/mudStore";
+import { useSetup } from "./mud/useSetup";
 
 type Props = {
   children: ReactNode;
+  loadingComponent: ReactNode;
 };
 
-export const MUDProvider = ({ children }: Props) => {
-  const [value, setValue] = useState<SetupResult | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+export const MUDProvider = ({ children, loadingComponent }: Props) => {
+  useSetup();
 
-  useEffect(() => {
-    const initSetup = async () => {
-      try {
-        const setupResult: SetupResult = await setup();
-        setValue(setupResult);
-      } catch (error) {
-        console.log("Error setting up MUD client", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const status = useMUDStore((state) => state.status);
 
-    initSetup();
-  }, []);
-
-  // TODO: figure out how to handle loading state better
   return (
-    <MUDContext.Provider value={value}>
-      {loading && <div>Loading...</div>}
-      {!loading && children}
-    </MUDContext.Provider>
+    <>
+      {/* TODO: handle loading states */}
+      {status === "loading" && loadingComponent}
+      {status !== "loading" && children}
+    </>
   );
-};
-
-export const useMUD = () => {
-  const value = useContext(MUDContext);
-  if (!value) throw new Error("Must be used within a MUDProvider");
-  return value;
 };
