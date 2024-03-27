@@ -81,6 +81,9 @@ importers:
       '@latticexyz/services':
         specifier: link:../../../mud/packages/services
         version: link:../../../mud/packages/services
+      '@latticexyz/store':
+        specifier: link:../../../mud/packages/store
+        version: link:../../../mud/packages/store
       '@latticexyz/store-sync':
         specifier: link:../../../mud/packages/store-sync
         version: link:../../../mud/packages/store-sync
@@ -90,6 +93,9 @@ importers:
       '@latticexyz/world':
         specifier: link:../../../mud/packages/world
         version: link:../../../mud/packages/world
+      '@latticexyz/world-modules':
+        specifier: link:../../../mud/packages/world-modules
+        version: link:../../../mud/packages/world-modules
       '@radix-ui/react-popover':
         specifier: ^1.0.7
         version: 1.0.7(@types/react-dom@18.2.7)(@types/react@18.2.22)(react-dom@18.2.0)(react@18.2.0)

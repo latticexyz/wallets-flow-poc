@@ -8,7 +8,7 @@ type FlowState = "signer" | "balance" | "delegate" | "play";
 
 const LatticeKitDialog = () => {
   const {
-    network: { registerUnlimitedDelegationWithSignature },
+    network: { registerUnlimitedDelegationWithSignatureNow },
   } = useMUD();
 
   const [activeTab, setActiveTab] = useState<FlowState>("signer");
@@ -110,11 +110,10 @@ const LatticeKitDialog = () => {
                 <Button
                   onClick={() => {
                     if (walletClientResult.data) {
-                      // Declare delegation parameters
+                      // Declare a random delegatee
                       const delegatee = "0x7203e7ADfDF38519e1ff4f8Da7DCdC969371f377";
-                      const nonce = 0n;
 
-                      registerUnlimitedDelegationWithSignature(walletClientResult.data, delegatee, nonce);
+                      registerUnlimitedDelegationWithSignatureNow(walletClientResult.data, delegatee);
                     }
 
                     setActiveTab("play");

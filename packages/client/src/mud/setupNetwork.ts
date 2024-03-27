@@ -36,6 +36,11 @@ import { Subject, share } from "rxjs";
  * for the source of this information.
  */
 import mudConfig from "contracts/mud.config";
+import modulesConfig from "@latticexyz/world-modules/mud.config";
+import { storeToV1 } from "@latticexyz/store/config/v2";
+import { resolveConfig } from "@latticexyz/store/internal";
+
+const resolvedConfig = resolveConfig(storeToV1(modulesConfig));
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
@@ -210,6 +215,22 @@ export async function setupNetwork() {
     return registerDelegationWithSignature(walletClient, delegatee, delegationControlId, initCallData, nonce);
   };
 
+  // "Now" because the nonce is automatically handled
+  const registerUnlimitedDelegationWithSignatureNow = (
+    walletClient: WalletClient<Transport, Chain, Account>,
+    delegatee: Hex,
+  ) => {
+    const delegationControlId = resourceToHex({ type: "system", namespace: "", name: "unlimited" });
+    const initCallData = "0x";
+    const nonceRecord = useStore
+      .getState()
+      .getRecord(resolvedConfig.tables.UserDelegationNonces, { delegator: walletClient.account.address });
+
+    const nonce = nonceRecord ? nonceRecord.value.nonce : 0n;
+
+    return registerDelegationWithSignature(walletClient, delegatee, delegationControlId, initCallData, nonce);
+  };
+
   return {
     tables,
     useStore,
@@ -223,5 +244,6 @@ export async function setupNetwork() {
     signDelegationMessage,
     registerDelegationWithSignature,
     registerUnlimitedDelegationWithSignature,
+    registerUnlimitedDelegationWithSignatureNow,
   };
 }
