@@ -220,15 +220,13 @@ export async function setupNetwork() {
     walletClient: WalletClient<Transport, Chain, Account>,
     delegatee: Hex,
   ) => {
-    const delegationControlId = resourceToHex({ type: "system", namespace: "", name: "unlimited" });
-    const initCallData = "0x";
     const nonceRecord = useStore
       .getState()
       .getRecord(resolvedConfig.tables.UserDelegationNonces, { delegator: walletClient.account.address });
 
     const nonce = nonceRecord ? nonceRecord.value.nonce : 0n;
 
-    return registerDelegationWithSignature(walletClient, delegatee, delegationControlId, initCallData, nonce);
+    return registerUnlimitedDelegationWithSignature(walletClient, delegatee, nonce);
   };
 
   return {
