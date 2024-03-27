@@ -14,7 +14,6 @@ export const MUDProvider = ({ children, loadingComponent }: Props) => {
 
   return (
     <>
-      {/* TODO: handle loading states */}
       {status === "loading" && loadingComponent}
       {status !== "loading" && children}
     </>

@@ -9,6 +9,7 @@ import { useMUDStore } from "./mudStore";
 import { setupBurnerSigner } from "./setupBurnerSigner";
 import { setupDevTools } from "./setupDevTools";
 import { SetupNetworkResult, setupNetwork } from "./setupNetwork";
+import { createUtilsCalls } from "./createUtilsCalls";
 
 export function useSetup() {
   const account = useAccount();
@@ -57,13 +58,14 @@ export function useSetup() {
         },
       });
       const systemCalls = createSystemCalls(network, worldContract);
+      const utilsCalls = createUtilsCalls(network, networkConfig, worldContract);
 
-      store.set({ status: "write", walletClient: burnerWalletClient, worldContract, systemCalls, network });
+      store.set({ status: "write", walletClient: burnerWalletClient, worldContract, systemCalls, network, utilsCalls });
 
       setupDevTools(network, burnerWalletClient, worldContract);
     };
 
-    if (account?.isConnected) {
+    if (account?.isConnected && store.status === "read") {
       createWallet();
     }
   }, [account, store]);

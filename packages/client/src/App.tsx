@@ -7,8 +7,8 @@ const styleUnset = { all: "unset" } as const;
 
 export const App = () => {
   const state = useMUD();
-
   const {
+    status,
     network: { useStore, tables },
   } = state;
 
@@ -39,7 +39,7 @@ export const App = () => {
   return (
     <>
       <ConnectButton />
-      <LatticeKitDialog />
+      {status === "write" && <LatticeKitDialog />}
 
       <table>
         <tbody>

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { SetupNetworkResult } from "./setupNetwork";
 import { WalletClient } from "viem";
 import { SystemCalls } from "./createSystemCalls";
+import { UtilsCalls } from "./createUtilsCalls";
 
 type SetState = (state: MUDState) => void;
 
@@ -18,6 +19,7 @@ export type MUDState =
       network: SetupNetworkResult;
       walletClient: WalletClient;
       systemCalls: SystemCalls;
+      utilsCalls: UtilsCalls;
       worldContract: any;
     };
 

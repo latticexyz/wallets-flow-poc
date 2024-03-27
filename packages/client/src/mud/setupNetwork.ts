@@ -3,10 +3,11 @@
  * (https://viem.sh/docs/getting-started.html).
  * This line imports the functions we need from it.
  */
-import { Subject } from "rxjs";
 import { createPublicClient, Hex } from "viem";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
+import { ContractWrite } from "@latticexyz/common";
+import { Subject } from "rxjs";
 
 /*
  * Import our MUD config, which includes strong types for
@@ -18,7 +19,6 @@ import { getNetworkConfig } from "./getNetworkConfig";
  */
 import mudConfig from "contracts/mud.config";
 import { getClientOptions } from "./getClientOptions";
-import { ContractWrite } from "@latticexyz/common";
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
