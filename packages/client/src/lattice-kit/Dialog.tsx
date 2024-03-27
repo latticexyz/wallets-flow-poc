@@ -3,13 +3,12 @@ import { Flex, Text, Button, Dialog, Tabs } from "@radix-ui/themes";
 import { useAccount } from "wagmi";
 import { useWalletClient } from "wagmi";
 import { useMUD } from "../MUDContext";
-import { resourceToHex } from "@latticexyz/common";
 
 type FlowState = "signer" | "balance" | "delegate" | "play";
 
 const LatticeKitDialog = () => {
   const {
-    network: { generateDelegationSignature },
+    network: { registerUnlimitedDelegationWithSignature },
   } = useMUD();
 
   const [activeTab, setActiveTab] = useState<FlowState>("signer");
@@ -113,17 +112,9 @@ const LatticeKitDialog = () => {
                     if (walletClientResult.data) {
                       // Declare delegation parameters
                       const delegatee = "0x7203e7ADfDF38519e1ff4f8Da7DCdC969371f377";
-                      const delegationControlId = resourceToHex({ type: "system", namespace: "", name: "unlimited" });
-                      const initCallData = "0x";
                       const nonce = 0n;
 
-                      generateDelegationSignature(
-                        walletClientResult.data,
-                        delegatee,
-                        delegationControlId,
-                        initCallData,
-                        nonce,
-                      );
+                      registerUnlimitedDelegationWithSignature(walletClientResult.data, delegatee, nonce);
                     }
 
                     setActiveTab("play");

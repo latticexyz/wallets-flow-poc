@@ -22,7 +22,7 @@ import { createFaucetService } from "@latticexyz/services/faucet";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
-import { createBurnerAccount, transportObserver, ContractWrite } from "@latticexyz/common";
+import { createBurnerAccount, transportObserver, ContractWrite, resourceToHex } from "@latticexyz/common";
 import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
 import { delegationWithSignatureTypes } from "@latticexyz/world/internal";
 import { Subject, share } from "rxjs";
@@ -182,6 +182,34 @@ export async function setupNetwork() {
     });
   };
 
+  const registerDelegationWithSignature = async (
+    walletClient: WalletClient<Transport, Chain, Account>,
+    delegatee: Hex,
+    delegationControlId: Hex,
+    initCallData: Hex,
+    nonce: bigint,
+  ) => {
+    const signature = await signDelegationMessage(walletClient, delegatee, delegationControlId, initCallData, nonce);
+
+    return walletClient.writeContract({
+      address: worldContract.address,
+      abi: DelegationAbi,
+      functionName: "registerDelegationWithSignature",
+      args: [delegatee, delegationControlId, initCallData, walletClient.account.address, signature],
+    });
+  };
+
+  const registerUnlimitedDelegationWithSignature = (
+    walletClient: WalletClient<Transport, Chain, Account>,
+    delegatee: Hex,
+    nonce: bigint,
+  ) => {
+    const delegationControlId = resourceToHex({ type: "system", namespace: "", name: "unlimited" });
+    const initCallData = "0x";
+
+    return registerDelegationWithSignature(walletClient, delegatee, delegationControlId, initCallData, nonce);
+  };
+
   return {
     tables,
     useStore,
@@ -192,23 +220,8 @@ export async function setupNetwork() {
     waitForTransaction,
     worldContract,
     write$: write$.asObservable().pipe(share()),
-    generateDelegationSignature: signDelegationMessage,
-    registerDelegationWithSignature: async (
-      walletClient: WalletClient<Transport, Chain, Account>,
-      delegatee: Hex,
-      delegationControlId: Hex,
-      initCallData: Hex,
-      nonce: bigint,
-    ) => {
-      // Sign registration message
-      const signature = await signDelegationMessage(walletClient, delegatee, delegationControlId, initCallData, nonce);
-
-      return walletClient.writeContract({
-        address: worldContract.address,
-        abi: DelegationAbi,
-        functionName: "registerDelegationWithSignature",
-        args: [delegatee, delegationControlId, initCallData, walletClient.account.address, signature],
-      });
-    },
+    signDelegationMessage,
+    registerDelegationWithSignature,
+    registerUnlimitedDelegationWithSignature,
   };
 }
