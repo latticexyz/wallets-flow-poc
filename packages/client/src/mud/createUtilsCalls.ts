@@ -55,8 +55,6 @@ export function createUtilsCalls(network: SetupNetworkResult, networkConfig: Net
     initCallData: Hex,
     nonce: bigint,
   ) => {
-    console.log('worldContract:', worldContract);
-
     return walletClient.signTypedData({
       domain: {
         chainId: networkConfig.chain.id,
