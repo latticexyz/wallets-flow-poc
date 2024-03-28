@@ -35,6 +35,7 @@ import worlds from "contracts/worlds.json";
  * for instructions on how to add networks.
  */
 import { supportedChains } from "./supportedChains";
+import { isHex } from "viem";
 
 export type NetworkConfig = Awaited<ReturnType<typeof getNetworkConfig>>;
 
@@ -69,6 +70,10 @@ export async function getNetworkConfig() {
   const worldAddress = params.get("worldAddress") || world?.address;
   if (!worldAddress) {
     throw new Error(`No world address found for chain ${chainId}. Did you run \`mud deploy\`?`);
+  }
+
+  if (!isHex(worldAddress)) {
+    throw new Error(`Invalid world address: ${worldAddress}`);
   }
 
   /*

@@ -3,10 +3,7 @@ import { deploy } from "./deploy";
 
 // Will deploy simpleAccountFactory V0.7 to 0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985
 export async function deploySimpleAccountFactory() {
-  const receipt = await deploy(
-    SimpleAccountFactory,
-    "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
-  );
+  const receipt = await deploy(SimpleAccountFactory, "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985");
   console.log("Deployed SimpleAccountFactory. Receipt:", receipt);
 }
 const SimpleAccountFactory: Hex =

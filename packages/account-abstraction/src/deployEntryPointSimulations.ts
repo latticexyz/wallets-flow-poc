@@ -3,10 +3,7 @@ import { deploy } from "./deploy";
 
 // Will deploy entryPointSimulations (required for V0.7) to 0xe629eB112f891a341Cd2B66b2376ba68e7011241
 export async function deployEntryPointSimulations() {
-  const receipt = await deploy(
-    EntryPointSimulations,
-    "0xe629eB112f891a341Cd2B66b2376ba68e7011241",
-  );
+  const receipt = await deploy(EntryPointSimulations, "0xe629eB112f891a341Cd2B66b2376ba68e7011241");
   console.log("Deployed EntryPointSimulations. Receipt:", receipt);
 }
 

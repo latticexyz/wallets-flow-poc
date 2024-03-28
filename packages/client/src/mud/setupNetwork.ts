@@ -8,6 +8,7 @@ import { syncToZustand } from "@latticexyz/store-sync/zustand";
 import { getNetworkConfig } from "./getNetworkConfig";
 import { ContractWrite } from "@latticexyz/common";
 import { Subject } from "rxjs";
+import modulesConfig from "@latticexyz/world-modules/mud.config";
 
 /*
  * Import our MUD config, which includes strong types for
@@ -19,6 +20,10 @@ import { Subject } from "rxjs";
  */
 import mudConfig from "contracts/mud.config";
 import { getClientOptions } from "./getClientOptions";
+import { resolveConfig } from "@latticexyz/store/config";
+import { storeToV1 } from "@latticexyz/store/config/v2";
+
+const resolvedModulesConfig = resolveConfig(storeToV1(modulesConfig));
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
@@ -48,6 +53,7 @@ export async function setupNetwork() {
     address: networkConfig.worldAddress as Hex,
     publicClient,
     startBlock: BigInt(networkConfig.initialBlockNumber),
+    tables: { UserDelegationNonces: resolvedModulesConfig.tables.UserDelegationNonces },
   });
 
   return {

@@ -3,10 +3,7 @@ import { deploy } from "./deploy";
 
 // Will deploy entryPoint to 0x0000000071727De22E5E9d8BAf0edAc6f37da032
 export async function deployEntryPoint() {
-  const receipt = await deploy(
-    EntryPoint,
-    "0x0000000071727de22e5e9d8baf0edac6f37da032",
-  );
+  const receipt = await deploy(EntryPoint, "0x0000000071727de22e5e9d8baf0edac6f37da032");
   console.log("Deployed EntryPoint. Receipt:", receipt);
 }
 
