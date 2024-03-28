@@ -37,6 +37,8 @@ import worlds from "contracts/worlds.json";
 import { supportedChains } from "./supportedChains";
 import { isHex } from "viem";
 
+export type NetworkConfig = Awaited<ReturnType<typeof getNetworkConfig>>;
+
 export async function getNetworkConfig() {
   const params = new URLSearchParams(window.location.search);
 

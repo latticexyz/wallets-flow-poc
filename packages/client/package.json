@@ -16,9 +16,11 @@
     "@latticexyz/react": "link:../../../mud/packages/react",
     "@latticexyz/schema-type": "link:../../../mud/packages/schema-type",
     "@latticexyz/services": "link:../../../mud/packages/services",
+    "@latticexyz/store": "link:../../../mud/packages/store",
     "@latticexyz/store-sync": "link:../../../mud/packages/store-sync",
     "@latticexyz/utils": "link:../../../mud/packages/utils",
     "@latticexyz/world": "link:../../../mud/packages/world",
+    "@latticexyz/world-modules": "link:../../../mud/packages/world-modules",
     "@radix-ui/react-popover": "^1.0.7",
     "@radix-ui/themes": "^3.0.0",
     "@rainbow-me/rainbowkit": "^2.0.2",
@@ -29,7 +31,8 @@
     "rxjs": "7.5.5",
     "viem": "2.7.12",
     "wagmi": "^2.5.12",
-    "permissionless": "^0.1.10"
+    "permissionless": "^0.1.10",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/react": "18.2.22",

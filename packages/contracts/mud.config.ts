@@ -12,4 +12,11 @@ export default defineWorld({
       key: ["id"],
     },
   },
+  modules: [
+    {
+      name: "Unstable_DelegationWithSignatureModule",
+      root: true,
+      args: [],
+    },
+  ],
 });

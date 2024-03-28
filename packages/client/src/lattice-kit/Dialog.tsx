@@ -1,15 +1,23 @@
 import { useEffect, useState } from "react";
-import { Box, Flex, Text, Button, Dialog, Tabs } from "@radix-ui/themes";
+import { Flex, Text, Button, Dialog, Tabs } from "@radix-ui/themes";
 import { useAccount } from "wagmi";
+import { useWalletClient } from "wagmi";
+import { useMUD } from "../mud/mudStore";
 
 type FlowState = "signer" | "balance" | "delegate" | "play";
 
 const LatticeKitDialog = () => {
+  const {
+    utilsCalls: { registerUnlimitedDelegationWithSignatureNow }, // TODO: TS
+    // network: { walletClient: walletClientResult },
+    smartAccountWalletClient,
+  } = useMUD();
   const [activeTab, setActiveTab] = useState<FlowState>("signer");
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
   const account = useAccount();
   const isConnected = account?.isConnected;
+  const walletClientResult = useWalletClient();
 
   useEffect(() => {
     if (isConnected && !shown) {
@@ -101,6 +109,20 @@ const LatticeKitDialog = () => {
               <Dialog.Close>
                 <Button
                   onClick={() => {
+                    console.log("walletClientResult", walletClientResult);
+
+                    if (walletClientResult.data) {
+                      // Declare a random delegatee
+                      // const delegatee = "0x7203e7ADfDF38519e1ff4f8Da7DCdC969371f377";
+                      const delegatee = smartAccountWalletClient.account.address;
+
+                      registerUnlimitedDelegationWithSignatureNow(
+                        walletClientResult.data,
+                        smartAccountWalletClient,
+                        delegatee,
+                      );
+                    }
+
                     setActiveTab("play");
                   }}
                 >
