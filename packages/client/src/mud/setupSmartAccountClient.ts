@@ -35,6 +35,7 @@ export async function setupSmartAccountClient(
   const appSigner = createBurnerAccount(networkConfig.privateKey as Hex) as PrivateKeyAccount;
 
   // 2. Create smart account for app
+  // TODO: is it deterministic?
   const appSmartAccount = await signerToSimpleSmartAccount(publicClient, {
     entryPoint: ENTRYPOINT_ADDRESS_V07,
     factoryAddress: "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985",
