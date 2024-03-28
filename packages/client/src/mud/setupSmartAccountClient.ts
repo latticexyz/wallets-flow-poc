@@ -1,6 +1,5 @@
-import { http, Hex, PrivateKeyAccount, Address } from "viem";
+import { http, Address, WalletClient } from "viem";
 import { NetworkConfig } from "./getNetworkConfig";
-import { createBurnerAccount } from "@latticexyz/common";
 import { writeObserver } from "@latticexyz/common/actions";
 import { callFrom } from "@latticexyz/world/internal";
 import { ENTRYPOINT_ADDRESS_V07, createSmartAccountClient } from "permissionless";
@@ -14,7 +13,8 @@ import { SetupNetworkResult } from "./setupNetwork";
 export async function setupSmartAccountClient(
   networkConfig: NetworkConfig,
   network: SetupNetworkResult,
-  accountAddress: Address,
+  appSigner: WalletClient, // app-signer wallet client
+  accountAddress: Address, // account address of EOA account
 ) {
   const clientOptions = getClientOptions(networkConfig);
   const publicClient = network.publicClient;
@@ -25,8 +25,6 @@ export async function setupSmartAccountClient(
     transport: http("http://127.0.0.1:4337"),
     entryPoint: ENTRYPOINT_ADDRESS_V07,
   });
-
-  const appSigner = createBurnerAccount(networkConfig.privateKey as Hex) as PrivateKeyAccount;
 
   const appSmartAccount = await signerToSimpleSmartAccount(publicClient, {
     entryPoint: ENTRYPOINT_ADDRESS_V07,

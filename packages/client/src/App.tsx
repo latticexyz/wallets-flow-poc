@@ -40,6 +40,7 @@ export const App = () => {
     <>
       <ConnectButton />
       {status === "write" && <LatticeKitDialog />}
+      {/* <LatticeKitDialog /> */}
 
       <table>
         <tbody>

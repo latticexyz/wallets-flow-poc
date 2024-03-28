@@ -2,22 +2,28 @@ import { useEffect, useState } from "react";
 import { Flex, Text, Button, Dialog, Tabs } from "@radix-ui/themes";
 import { useAccount } from "wagmi";
 import { useWalletClient } from "wagmi";
-import { useMUD } from "../mud/mudStore";
+import { useMUD, useMUDStore } from "../mud/mudStore";
 
 type FlowState = "signer" | "balance" | "delegate" | "play";
 
 const LatticeKitDialog = () => {
   const {
-    utilsCalls: { registerUnlimitedDelegationWithSignatureNow }, // TODO: TS
-    // network: { walletClient: walletClientResult },
+    utilsCalls: { registerUnlimitedDelegationWithSignatureNow, signAppSignerGenerationMessage }, // TODO: TS
+    appSignerWalletClient,
     smartAccountWalletClient,
   } = useMUD();
+  const store = useMUDStore();
   const [activeTab, setActiveTab] = useState<FlowState>("signer");
   const [open, setOpen] = useState(false);
   const [shown, setShown] = useState(false);
   const account = useAccount();
   const isConnected = account?.isConnected;
-  const walletClientResult = useWalletClient();
+
+  const mainWallet = useWalletClient();
+
+  console.log("mainWallet", mainWallet);
+  console.log("appSignerWalletClient", appSignerWalletClient);
+  console.log("smartAccountWalletClient", smartAccountWalletClient);
 
   useEffect(() => {
     if (isConnected && !shown) {
@@ -52,7 +58,13 @@ const LatticeKitDialog = () => {
               </Dialog.Close>
               <Dialog.Close>
                 <Button
-                  onClick={() => {
+                  onClick={async () => {
+                    const appSignerWalletClient = await signAppSignerGenerationMessage(mainWallet.data);
+
+                    store.set({
+                      appSignerWalletClient,
+                    });
+
                     setActiveTab("balance");
                   }}
                 >
@@ -109,16 +121,13 @@ const LatticeKitDialog = () => {
               <Dialog.Close>
                 <Button
                   onClick={() => {
-                    console.log("walletClientResult", walletClientResult);
-
-                    if (walletClientResult.data) {
+                    if (mainWallet.data) {
                       // Declare a random delegatee
-                      // const delegatee = "0x7203e7ADfDF38519e1ff4f8Da7DCdC969371f377";
                       const delegatee = smartAccountWalletClient.account.address;
-
                       registerUnlimitedDelegationWithSignatureNow(
-                        walletClientResult.data,
+                        mainWallet.data,
                         smartAccountWalletClient,
+                        appSignerWalletClient,
                         delegatee,
                       );
                     }
