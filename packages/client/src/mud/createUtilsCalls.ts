@@ -1,4 +1,4 @@
-import { Hex, WalletClient, Transport, Chain, Account } from "viem";
+import { Hex, WalletClient, Transport, Chain, Account, hashMessage } from "viem";
 import { NetworkConfig } from "./getNetworkConfig";
 import { resourceToHex } from "@latticexyz/common";
 import { delegationWithSignatureTypes } from "@latticexyz/world/internal";

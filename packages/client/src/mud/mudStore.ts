@@ -6,23 +6,16 @@ import { UtilsCalls } from "./createUtilsCalls";
 
 type SetState = (state: MUDState) => void;
 
-export type MUDState =
-  | {
-      status: "loading";
-    }
-  | {
-      status: "read";
-      network: SetupNetworkResult;
-    }
-  | {
-      status: "write";
-      network: SetupNetworkResult;
-      walletClient: WalletClient;
-      smartAccountWalletClient: WalletClient;
-      systemCalls: SystemCalls;
-      utilsCalls: UtilsCalls;
-      worldContract: any;
-    };
+export type MUDState = {
+  status: "loading" | "read" | "write";
+  network: SetupNetworkResult | null;
+  walletClient: WalletClient | null;
+  appSignerWalletClient: WalletClient | null;
+  smartAccountWalletClient: WalletClient | null;
+  systemCalls: SystemCalls | null;
+  utilsCalls: UtilsCalls | null;
+  worldContract: any;
+};
 
 export const useMUDStore = create<MUDState & { set: SetState }>((set) => ({
   status: "loading",
