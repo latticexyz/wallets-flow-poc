@@ -6,11 +6,10 @@ import { createSystemCalls } from "./createSystemCalls";
 import { getNetworkConfig } from "./getNetworkConfig";
 import { initFaucetService } from "./initFaucetService"; // TODO: add back
 import { useMUDStore } from "./mudStore";
-import { setupBurnerSigner } from "./setupBurnerSigner";
 import { setupDevTools } from "./setupDevTools";
 import { SetupNetworkResult, setupNetwork } from "./setupNetwork";
 import { createUtilsCalls } from "./createUtilsCalls";
-import { setupSmartAccountClient } from "./setupSmartAccountClient";
+import { setupSmartAccountClient } from "./utils/setupSmartAccountClient";
 
 export function useSetup() {
   const account = useAccount();
@@ -46,9 +45,6 @@ export function useSetup() {
        */
       const networkConfig = await getNetworkConfig();
       const network = store.network as SetupNetworkResult;
-      // const appSignerWalletClient = store.network.walletClient;
-      // const appSignerWalletClient = await setupBurnerSigner(network);
-
       const appSignerWalletClient = store.appSignerWalletClient;
       const smartAccountWalletClient = await setupSmartAccountClient(
         networkConfig,
@@ -56,7 +52,6 @@ export function useSetup() {
         appSignerWalletClient,
         account.address,
       );
-      // const appSignerWalletClient = smartAccountWalletClient; // TODO: remove this line
 
       // await initFaucetService(appSignerWalletClient, network, networkConfig); // TODO: add back faucet?
 
@@ -65,7 +60,7 @@ export function useSetup() {
         abi: IWorldAbi,
         client: {
           public: network.publicClient,
-          wallet: appSignerWalletClient,
+          wallet: smartAccountWalletClient,
         },
       });
       const systemCalls = createSystemCalls(network, worldContract);
@@ -73,20 +68,17 @@ export function useSetup() {
 
       store.set({
         status: "write",
-        walletClient: appSignerWalletClient,
         smartAccountWalletClient,
         worldContract,
-        systemCalls,
         network,
         utilsCalls,
+        systemCalls,
       });
 
       setupDevTools(network, appSignerWalletClient, worldContract);
     };
 
-    console.log('store', store);
-
-    if (account?.isConnected && store.appSignerWalletClient) {
+    if (account?.isConnected && store.appSignerWalletClient && !store.smartAccountWalletClient) {
       createWallet();
     }
   }, [account, store]);

@@ -1,24 +1,21 @@
-import { Hex, Chain } from "viem";
-import { NetworkConfig } from "./getNetworkConfig";
-import { SetupNetworkResult } from "./setupNetwork";
-
+import { Chain } from "viem";
+import { NetworkConfig } from "../getNetworkConfig";
+import { SetupNetworkResult } from "../setupNetwork";
 import { http, PrivateKeyAccount, parseEther, Address, createWalletClient } from "viem";
-
-import { createBurnerAccount } from "@latticexyz/common";
-import { transactionQueue, writeObserver } from "@latticexyz/common/actions";
+import { writeObserver } from "@latticexyz/common/actions";
 import { callFrom } from "@latticexyz/world/internal";
 import { ENTRYPOINT_ADDRESS_V07, createSmartAccountClient } from "permissionless";
 import { signerToSimpleSmartAccount } from "permissionless/accounts";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { call, getTransactionCount } from "viem/actions";
-
 import { mnemonicToAccount } from "viem/accounts";
 import { foundry } from "viem/chains";
-import { getClientOptions } from "./getClientOptions";
+import { getClientOptions } from "../getClientOptions";
 
 export async function setupSmartAccountClient(
   networkConfig: NetworkConfig,
   network: SetupNetworkResult,
+  appSigner: PrivateKeyAccount,
   accountAddress: Address,
 ) {
   const clientOptions = getClientOptions(networkConfig);
@@ -32,7 +29,7 @@ export async function setupSmartAccountClient(
   });
 
   // 1. Create app signer
-  const appSigner = createBurnerAccount(networkConfig.privateKey as Hex) as PrivateKeyAccount;
+  // const appSigner = createBurnerAccount(networkConfig.privateKey as Hex) as PrivateKeyAccount;
 
   // 2. Create smart account for app
   const appSmartAccount = await signerToSimpleSmartAccount(publicClient, {
@@ -62,10 +59,7 @@ export async function setupSmartAccountClient(
     .extend(
       callFrom({
         worldAddress: networkConfig.worldAddress,
-        // TODO: how can we get access to the main wallet here?
-        // Maybe setting up the `wallet client` should be somehow separate from the initial network setup,
-        // since it depends on the main user wallet being connected.
-        // Also, what if the user changes their main wallet? How do we update the burner wallet?
+        // TODO: handle EOA changes
         delegatorAddress: accountAddress,
         publicClient,
       }),
@@ -73,6 +67,7 @@ export async function setupSmartAccountClient(
 
   ////////////////////
   // JUST IN DEV
+  // TODO: might be able to remove?
   async function seedAccount(to: Address, chain: Chain) {
     const account = mnemonicToAccount("test test test test test test test test test test test junk", {
       addressIndex: 3,

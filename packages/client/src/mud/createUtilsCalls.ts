@@ -7,27 +7,12 @@ import { storeToV1 } from "@latticexyz/store/config/v2";
 import { resolveConfig } from "@latticexyz/store/internal";
 import { SetupNetworkResult } from "./setupNetwork";
 import { DelegationAbi } from "./abi/DelegationAbi";
-import { privateKeyToAccount } from "viem/accounts";
 
 export type UtilsCalls = ReturnType<typeof createUtilsCalls>;
 
 const resolvedConfig = resolveConfig(storeToV1(modulesConfig));
 
 export function createUtilsCalls(network: SetupNetworkResult, networkConfig: NetworkConfig, worldContract: any) {
-  // TODO: make it actually work
-  const signAppSignerGenerationMessage = async (walletClient: WalletClient<Transport, Chain, Account>) => {
-    const sig = await walletClient.signMessage({
-      account: walletClient.account,
-      // TODO: make a more unique message
-      message: "Create app-signer",
-    });
-
-    // TODO: move app-signer creation elsehwere
-    const appSignerWalletClient = privateKeyToAccount(hashMessage(sig));
-
-    return appSignerWalletClient;
-  };
-
   const signDelegationMessage = (
     walletClient: WalletClient<Transport, Chain, Account>,
     delegatee: Hex,
@@ -107,7 +92,6 @@ export function createUtilsCalls(network: SetupNetworkResult, networkConfig: Net
 
   return {
     signDelegationMessage,
-    signAppSignerGenerationMessage,
     registerDelegationWithSignature,
     registerUnlimitedDelegationWithSignature,
     registerUnlimitedDelegationWithSignatureNow,

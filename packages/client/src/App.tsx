@@ -1,14 +1,15 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useWalletClient } from "wagmi";
+import { Hex } from "viem";
 import LatticeKitDialog from "./lattice-kit/Dialog";
 import { useMUD } from "./mud/mudStore";
-import { Hex } from "viem";
 
 const styleUnset = { all: "unset" } as const;
 
 export const App = () => {
   const state = useMUD();
+  const mainWallet = useWalletClient();
   const {
-    status,
     network: { useStore, tables },
   } = state;
 
@@ -39,8 +40,7 @@ export const App = () => {
   return (
     <>
       <ConnectButton />
-      {status === "write" && <LatticeKitDialog />}
-      {/* <LatticeKitDialog /> */}
+      {mainWallet && <LatticeKitDialog />}
 
       <table>
         <tbody>

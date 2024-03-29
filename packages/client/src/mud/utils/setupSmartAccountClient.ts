@@ -1,19 +1,19 @@
-import { http, Address, WalletClient } from "viem";
-import { NetworkConfig } from "./getNetworkConfig";
+import { http, Address, PrivateKeyAccount } from "viem";
+import { NetworkConfig } from "../getNetworkConfig";
 import { writeObserver } from "@latticexyz/common/actions";
 import { callFrom } from "@latticexyz/world/internal";
 import { ENTRYPOINT_ADDRESS_V07, createSmartAccountClient } from "permissionless";
 import { signerToSimpleSmartAccount } from "permissionless/accounts";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { call, getTransactionCount } from "viem/actions";
-import { MOCK_PAYMASTER_ADDRESS } from "../../../account-abstraction/src/deployPaymaster";
-import { getClientOptions } from "./getClientOptions";
-import { SetupNetworkResult } from "./setupNetwork";
+import { MOCK_PAYMASTER_ADDRESS } from "../../../../account-abstraction/src/deployPaymaster";
+import { getClientOptions } from "../getClientOptions";
+import { SetupNetworkResult } from "../setupNetwork";
 
 export async function setupSmartAccountClient(
   networkConfig: NetworkConfig,
   network: SetupNetworkResult,
-  appSigner: WalletClient, // app-signer wallet client
+  appSigner: PrivateKeyAccount, // app-signer wallet client
   accountAddress: Address, // account address of EOA account
 ) {
   const clientOptions = getClientOptions(networkConfig);
@@ -67,10 +67,7 @@ export async function setupSmartAccountClient(
     .extend(
       callFrom({
         worldAddress: networkConfig.worldAddress,
-        // TODO: how can we get access to the main wallet here?
-        // Maybe setting up the `wallet client` should be somehow separate from the initial network setup,
-        // since it depends on the main user wallet being connected.
-        // Also, what if the user changes their main wallet? How do we update the burner wallet?
+        // TODO: handle EOA change
         delegatorAddress: accountAddress,
         publicClient,
       }),
