@@ -6,7 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "wait-port localhost:8545 && pnpm run deploy-contracts && pnpm run start:alto",
-    "start:alto": "pnpm alto run --config ./config.localhost.json",
+    "start:alto": "pushd node_modules/alto; pnpm install; popd; pnpm alto run --config ./config.localhost.json",
     "deploy-contracts": "tsx scripts/deployContracts.ts"
   },
   "dependencies": {
