@@ -1,14 +1,10 @@
 import { Dialog } from "@radix-ui/themes";
+import { useLogin } from "./useLogin";
+import { AppSignerDialogContent } from "./AppSignerDialogContent";
 
-export function LoginDialog() {
-  return (
-    <Dialog.Root>
-      <Dialog.Content maxWidth="450px">
-        <Dialog.Title>Generate app-signer</Dialog.Title>
-        <Dialog.Description size="2" mb="4">
-          Generate app-signer description
-        </Dialog.Description>
-      </Dialog.Content>
-    </Dialog.Root>
-  );
+export type Props = Pick<Dialog.RootProps, "open" | "onOpenChange">;
+
+export function LoginDialog(props: Props) {
+  const { currentRequirement } = useLogin();
+  return <Dialog.Root {...props}>{currentRequirement === "appSigner" ? <AppSignerDialogContent /> : null}</Dialog.Root>;
 }

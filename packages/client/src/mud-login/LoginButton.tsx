@@ -1,8 +1,9 @@
 import { Button } from "@radix-ui/themes";
 import { useLogin } from "./useLogin";
+import { LoginDialog } from "./LoginDialog";
 
 export function LoginButton() {
-  const { currentRequirement, openConnectModal, openLoginDialog } = useLogin();
+  const { currentRequirement, openConnectModal, openLoginDialog, toggleLoginDialog, loginDialogOpen } = useLogin();
 
   if (currentRequirement === "connectedWallet") {
     return (
@@ -13,7 +14,12 @@ export function LoginButton() {
   }
 
   if (currentRequirement === "appSigner") {
-    return <Button onClick={openLoginDialog}>Login</Button>;
+    return (
+      <>
+        <Button onClick={openLoginDialog}>Login</Button>
+        <LoginDialog open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
+      </>
+    );
   }
 
   // TODO

@@ -16,6 +16,7 @@ export type UseLoginResult = {
   readonly loginDialogOpen: boolean;
   readonly openLoginDialog: () => void;
   readonly closeLoginDialog: () => void;
+  readonly toggleLoginDialog: (open: boolean) => void;
 };
 
 export function useLogin(): UseLoginResult {
@@ -31,6 +32,10 @@ export function useLogin(): UseLoginResult {
 
   const closeLoginDialog = useCallback(() => {
     store.setState({ dialogOpen: false });
+  }, []);
+
+  const toggleLoginDialog = useCallback((open: boolean) => {
+    store.setState({ dialogOpen: open });
   }, []);
 
   const requirements = useMemo(() => {
@@ -50,7 +55,8 @@ export function useLogin(): UseLoginResult {
       loginDialogOpen,
       openLoginDialog,
       closeLoginDialog,
+      toggleLoginDialog,
     }),
-    [closeLoginDialog, loginDialogOpen, openConnectModal, openLoginDialog, requirements],
+    [closeLoginDialog, loginDialogOpen, openConnectModal, openLoginDialog, requirements, toggleLoginDialog],
   );
 }

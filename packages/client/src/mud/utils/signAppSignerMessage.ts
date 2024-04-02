@@ -1,11 +1,12 @@
-import { WalletClient, Transport, Chain, Account } from "viem";
+import { Account, Chain, Hex, Transport, WalletClient } from "viem";
+import { signMessage } from "viem/actions";
 
-export const signAppSignerMessage = async (walletClient: WalletClient<Transport, Chain, Account>) => {
-  const signature = await walletClient.signMessage({
+export async function signAppSignerMessage(walletClient: WalletClient<Transport, Chain, Account>): Promise<Hex> {
+  const signature = await signMessage(walletClient, {
     account: walletClient.account,
-    // TODO: make signer based on website URL
+    // TODO: improve message, include location.origin
     message: "Create app-signer",
   });
 
   return signature;
-};
+}
