@@ -3,6 +3,7 @@ import { useWalletClient } from "wagmi";
 import { Hex } from "viem";
 import LatticeKitDialog from "./lattice-kit/Dialog";
 import { useMUD } from "./mud/mudStore";
+import { LoginButton } from "./mud-login";
 
 const styleUnset = { all: "unset" } as const;
 
@@ -39,6 +40,8 @@ export const App = () => {
 
   return (
     <>
+      <LoginButton />
+
       <ConnectButton />
       {mainWallet && <LatticeKitDialog />}
 

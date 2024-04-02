@@ -24,8 +24,8 @@ const LatticeKitDialog = () => {
 
   useEffect(() => {
     if (isConnected && !shown) {
-      setOpen(true);
-      setShown(true);
+      // setOpen(true);
+      // setShown(true);
     }
   }, [shown, isConnected]);
 
