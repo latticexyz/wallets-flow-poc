@@ -1,9 +1,11 @@
 import { createStore } from "zustand/vanilla";
 import { subscribeWithSelector } from "zustand/middleware";
-import { WalletClient } from "viem";
+import { PrivateKeyAccount, WalletClient } from "viem";
 
 export type State = {
   dialogOpen: boolean;
+  appSignerAccount: PrivateKeyAccount | null;
+  // TODO: deprecate/replace? calculate on the fly?
   walletClient: WalletClient | null;
   appSignerWalletClient: WalletClient | null;
   smartAccountWalletClient: WalletClient | null;
@@ -11,9 +13,10 @@ export type State = {
 
 const initialState = {
   dialogOpen: false,
+  appSignerAccount: null,
   walletClient: null,
   appSignerWalletClient: null,
   smartAccountWalletClient: null,
-} satisfies State;
+} as const satisfies State;
 
 export const store = createStore(subscribeWithSelector<State>(() => initialState));

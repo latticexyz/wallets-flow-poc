@@ -2,3 +2,4 @@
 // This is here just to demonstrate what a public package might export to consumers to create clearer lines between internal exports and external ones.
 
 export { LoginButton } from "./LoginButton";
+export { useLogin } from "./useLogin";
