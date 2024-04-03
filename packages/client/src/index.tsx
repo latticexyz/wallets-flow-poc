@@ -27,12 +27,14 @@ const rootElement = document.getElementById("react-root");
 if (!rootElement) throw new Error("React root not found");
 const root = ReactDOM.createRoot(rootElement);
 
+const networkConfig = getNetworkConfig();
+
 root.render(
   <Theme>
     <WagmiProvider config={config}>
       <QueryClientProvider client={client}>
         <RainbowKitProvider>
-          <MUDLoginProvider config={{ worldAddress: getNetworkConfig().worldAddress }}>
+          <MUDLoginProvider config={{ chainId: networkConfig.chainId, worldAddress: networkConfig.worldAddress }}>
             <MUDProvider loadingComponent={<>Loading</>}>
               <App />
             </MUDProvider>

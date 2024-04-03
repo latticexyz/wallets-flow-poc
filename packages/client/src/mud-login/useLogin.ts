@@ -26,6 +26,7 @@ export function useLogin(): UseLoginResult {
   const appSignerAccount = useStore((state) => state.appSignerAccount);
   const gasAllowance = useStore((state) => state.mockGasAllowance);
   const appAccountClient = useAppAccountClient();
+  const hasDelegation = useStore((state) => state.hasDelegation);
 
   const openLoginDialog = useCallback(() => {
     store.setState({ dialogOpen: true });
@@ -44,12 +45,11 @@ export function useLogin(): UseLoginResult {
       connectedWallet: () => accountStatus === "connected",
       appSigner: () => appSignerAccount != null,
       gasAllowance: () => gasAllowance != null && gasAllowance > 0n,
-      // TODO
-      accountDelegation: () => appAccountClient != null,
+      accountDelegation: () => appAccountClient != null && hasDelegation === true,
     } as const satisfies Record<LoginRequirement, () => boolean>;
 
     return loginRequirements.filter((requirement) => !satisfiesRequirement[requirement]());
-  }, [accountStatus, appAccountClient, appSignerAccount, gasAllowance]);
+  }, [accountStatus, appAccountClient, appSignerAccount, gasAllowance, hasDelegation]);
 
   return useMemo(
     () => ({

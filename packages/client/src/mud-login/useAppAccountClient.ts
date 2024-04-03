@@ -1,10 +1,10 @@
 import { useMemo } from "react";
 import { useAccount, usePublicClient } from "wagmi";
-import { http } from "viem";
+import { Chain, Transport, http } from "viem";
 import { callFrom } from "@latticexyz/world/internal";
 import { usePromise } from "@latticexyz/react";
 import { SmartAccountClient, createSmartAccountClient } from "permissionless";
-import { signerToSimpleSmartAccount } from "permissionless/accounts";
+import { SmartAccount, signerToSimpleSmartAccount } from "permissionless/accounts";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { call, getTransactionCount } from "viem/actions";
 import { MOCK_PAYMASTER_ADDRESS } from "account-abstraction/src/deployPaymaster";
@@ -12,17 +12,18 @@ import { useLoginConfig } from "./Context";
 import { useStore } from "./useStore";
 import { entryPoint } from "./common";
 
-export function useAppAccountClient(): SmartAccountClient<typeof entryPoint> | undefined {
+export function useAppAccountClient():
+  | SmartAccountClient<typeof entryPoint, Transport, Chain, SmartAccount<typeof entryPoint>>
+  | undefined {
   const appSignerAccount = useStore((state) => state.appSignerAccount);
-  const { worldAddress } = useLoginConfig();
-  const { address: eoaAddress } = useAccount();
-  // TODO: replace with our own hook that is pinned to the specific chain
-  const publicClient = usePublicClient();
+  const { chainId, worldAddress } = useLoginConfig();
+  const { address: userAddress } = useAccount();
+  const publicClient = usePublicClient({ chainId });
 
   const result = usePromise(
     useMemo(async () => {
       if (!appSignerAccount) return;
-      if (!eoaAddress) return;
+      if (!userAddress) return;
       if (!publicClient) return;
 
       const pimlicoBundlerClient = createPimlicoBundlerClient({
@@ -74,13 +75,13 @@ export function useAppAccountClient(): SmartAccountClient<typeof entryPoint> | u
         .extend(
           callFrom({
             worldAddress,
-            delegatorAddress: eoaAddress,
+            delegatorAddress: userAddress,
             publicClient,
           }),
         );
 
       return appAccountClient;
-    }, [eoaAddress, appSignerAccount, worldAddress, publicClient]),
+    }, [userAddress, appSignerAccount, worldAddress, publicClient]),
   );
 
   // TODO: handle errors

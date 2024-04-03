@@ -11,6 +11,7 @@ export type State = {
   smartAccountWalletClient: WalletClient | null;
   // TODO: replace with real allowance check
   mockGasAllowance: bigint | null;
+  hasDelegation: boolean | null;
 };
 
 const initialState = {
@@ -20,6 +21,7 @@ const initialState = {
   appSignerWalletClient: null,
   smartAccountWalletClient: null,
   mockGasAllowance: null,
+  hasDelegation: null,
 } as const satisfies State;
 
 export const store = createStore(subscribeWithSelector<State>(() => initialState));

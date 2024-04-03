@@ -1,7 +1,7 @@
 import { Dialog } from "@radix-ui/themes";
 import { AppSignerDialogContent } from "./AppSignerDialogContent";
 import { GasAllowanceDialogContent } from "./GasAllowanceDialogContent";
-import { AccountDelegationDialogContent } from "./AccountDelegationDialogContent.tsx";
+import { AccountDelegationDialogContent } from "./AccountDelegationDialogContent";
 import { LoginRequirement } from "./common";
 import { useMemo } from "react";
 import { assertExhaustive } from "@latticexyz/common/utils";
