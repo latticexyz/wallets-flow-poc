@@ -12,8 +12,8 @@
   },
   "dependencies": {
     "@latticexyz/cli": "^2.0.4",
-    "@latticexyz/gas-tank": "git+https://github.com/latticexyz/gas-tank.git",
-    "alto": "git+https://github.com/latticexyz/alto.git",
+    "@latticexyz/gas-tank": "git+https://github.com/latticexyz/gas-tank.git#bacfb77",
+    "alto": "git+https://github.com/latticexyz/alto.git#3192a9a",
     "fastify": "^4.26.2",
     "typescript": "5.4.2",
     "viem": "2.7.12",
