@@ -10,3 +10,5 @@ TODO
 - play around with moving requirements to a hook for each component/screen
   - maybe can detect when a component is rendered as null? or when it throws?
   - would suspense help?
+- handle interacting with UI if we've not fully logged in
+- figure out why waitForTransaction stalls and is slower than getting events
