@@ -39,7 +39,7 @@ import { isHex } from "viem";
 
 export type NetworkConfig = Awaited<ReturnType<typeof getNetworkConfig>>;
 
-export async function getNetworkConfig() {
+export function getNetworkConfig() {
   const params = new URLSearchParams(window.location.search);
 
   /*

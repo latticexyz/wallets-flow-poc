@@ -3,3 +3,4 @@
 
 export { LoginButton } from "./LoginButton";
 export { useLogin } from "./useLogin";
+export { MUDLoginProvider } from "./Context";

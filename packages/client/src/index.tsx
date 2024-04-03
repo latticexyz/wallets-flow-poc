@@ -10,6 +10,8 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { transportObserver } from "@latticexyz/common";
 import { fallback, webSocket } from "viem";
 import { Theme } from "@radix-ui/themes";
+import { MUDLoginProvider } from "./mud-login";
+import { getNetworkConfig } from "./mud/getNetworkConfig";
 
 const config = createConfig({
   chains: [foundry],
@@ -30,9 +32,11 @@ root.render(
     <WagmiProvider config={config}>
       <QueryClientProvider client={client}>
         <RainbowKitProvider>
-          <MUDProvider loadingComponent={<>Loading</>}>
-            <App />
-          </MUDProvider>
+          <MUDLoginProvider config={{ worldAddress: getNetworkConfig().worldAddress }}>
+            <MUDProvider loadingComponent={<>Loading</>}>
+              <App />
+            </MUDProvider>
+          </MUDLoginProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiProvider>

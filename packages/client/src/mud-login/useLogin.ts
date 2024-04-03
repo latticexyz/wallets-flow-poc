@@ -3,11 +3,10 @@ import { useCallback, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { store } from "./store";
 import { useStore } from "./useStore";
+import { useAppAccountClient } from "./useAppAccountClient";
+import { LoginRequirement, loginRequirements } from "./common";
 
-export const loginRequirements = ["connectedWallet", "appSigner"] as const;
-
-export type LoginRequirement = (typeof loginRequirements)[number];
-
+// TODO: split this out into multiple hooks
 export type UseLoginResult = {
   readonly currentRequirement: LoginRequirement | null;
   readonly requirements: readonly LoginRequirement[];
@@ -25,6 +24,8 @@ export function useLogin(): UseLoginResult {
 
   const loginDialogOpen = useStore((state) => state.dialogOpen);
   const appSignerAccount = useStore((state) => state.appSignerAccount);
+  const gasAllowance = useStore((state) => state.mockGasAllowance);
+  const appAccountClient = useAppAccountClient();
 
   const openLoginDialog = useCallback(() => {
     store.setState({ dialogOpen: true });
@@ -42,10 +43,13 @@ export function useLogin(): UseLoginResult {
     const satisfiesRequirement = {
       connectedWallet: () => accountStatus === "connected",
       appSigner: () => appSignerAccount != null,
+      gasAllowance: () => gasAllowance != null && gasAllowance > 0n,
+      // TODO
+      accountDelegation: () => appAccountClient != null,
     } as const satisfies Record<LoginRequirement, () => boolean>;
 
     return loginRequirements.filter((requirement) => !satisfiesRequirement[requirement]());
-  }, [accountStatus, appSignerAccount]);
+  }, [accountStatus, appAccountClient, appSignerAccount, gasAllowance]);
 
   return useMemo(
     () => ({
