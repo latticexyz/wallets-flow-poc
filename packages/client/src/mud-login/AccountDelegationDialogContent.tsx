@@ -3,12 +3,13 @@ import { useAppAccountClient } from "./useAppAccountClient";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { useLoginConfig } from "./Context";
 import modulesConfig from "@latticexyz/world-modules/mud.config";
+
 import { getRecord } from "./getRecord";
 import { useCreatePromise } from "./useCreatePromise";
 import { Account, Address, Chain, Hex, Transport, WalletClient } from "viem";
 import { signTypedData, waitForTransactionReceipt, writeContract } from "viem/actions";
 import { delegationWithSignatureTypes } from "@latticexyz/world/internal";
-import { DelegationAbi } from "../mud/abi/DelegationAbi";
+import DelegationAbi from "@latticexyz/world-modules/out/IUnstable_DelegationWithSignatureSystem.sol/IUnstable_DelegationWithSignatureSystem.abi.json";
 import { SmartAccount } from "permissionless/accounts";
 import { entryPoint, unlimitedDelegationControlId } from "./common";
 import { SmartAccountClient } from "permissionless";

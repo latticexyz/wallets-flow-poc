@@ -1,21 +1,34 @@
-import { ReactNode } from "react";
-import { useMUDStore } from "./mud/mudStore";
-import { useSetup } from "./mud/useSetup";
+import { ReactNode, createContext, useContext, useMemo } from "react";
+import { usePromise } from "@latticexyz/react";
+import { SetupNetworkResult, setupNetwork } from "./mud/setupNetwork";
 
-type Props = {
+/** @internal */
+const MUDContext = createContext<SetupNetworkResult | null>(null);
+
+export type Props = {
   children: ReactNode;
-  loadingComponent: ReactNode;
 };
 
-export const MUDProvider = ({ children, loadingComponent }: Props) => {
-  useSetup();
+export function MUDProvider({ children }: Props) {
+  const currentValue = useContext(MUDContext);
+  if (currentValue) throw new Error("`MUDProvider` can only be used once.");
 
-  const status = useMUDStore((state) => state.status);
+  const setupNetworkResult = usePromise(useMemo(async () => await setupNetwork(), []));
 
-  return (
-    <>
-      {status === "loading" && loadingComponent}
-      {status !== "loading" && children}
-    </>
-  );
-};
+  if (setupNetworkResult.status === "fulfilled") {
+    return <MUDContext.Provider value={setupNetworkResult.value}>{children}</MUDContext.Provider>;
+  }
+
+  if (setupNetworkResult.status === "rejected") {
+    throw setupNetworkResult.reason;
+  }
+
+  // TODO: allow this to be configured
+  return <>Loading…</>;
+}
+
+export function useMUD() {
+  const value = useContext(MUDContext);
+  if (!value) throw new Error("`useMUD` must be used within a `MUDProvider`.");
+  return value;
+}

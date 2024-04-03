@@ -1,49 +1,77 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
-import { useWalletClient } from "wagmi";
-import { Hex } from "viem";
-import LatticeKitDialog from "./lattice-kit/Dialog";
-import { useMUD } from "./mud/mudStore";
-import { LoginButton } from "./mud-login";
+import { getContract } from "viem";
+import { LoginButton, useAppAccountClient } from "./mud-login";
+import { useMUD } from "./MUDContext";
+import { createSystemCalls } from "./mud/createSystemCalls";
+import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
+import { networkConfig, publicClient } from "./common";
+import { useEffect } from "react";
+import config from "contracts/mud.config";
 
 const styleUnset = { all: "unset" } as const;
 
 export const App = () => {
-  const state = useMUD();
-  const mainWallet = useWalletClient();
-  const {
-    network: { useStore, tables },
-  } = state;
+  const network = useMUD();
+  const appAccountClient = useAppAccountClient();
 
-  const tasks = useStore((state) => {
-    const records = Object.values(state.getRecords(tables.Tasks));
+  const worldContract = getContract({
+    abi: IWorldAbi,
+    address: networkConfig.worldAddress,
+    client: {
+      public: publicClient,
+      wallet: appAccountClient,
+    },
+  });
+
+  const systemCalls = createSystemCalls(network, worldContract);
+
+  useEffect(() => {
+    if (!appAccountClient) return;
+
+    // https://vitejs.dev/guide/env-and-mode.html
+    async function mount() {
+      if (import.meta.env.DEV) {
+        const { mount: mountDevTools } = await import("@latticexyz/dev-tools");
+        return mountDevTools({
+          config,
+          publicClient,
+          // TODO: fix type, also make walletClient optional?
+          // TODO: allow multiple calls to mount to update
+          walletClient: appAccountClient,
+          latestBlock$: network.latestBlock$,
+          storedBlockLogs$: network.storedBlockLogs$,
+          worldAddress: worldContract.address,
+          worldAbi: worldContract.abi,
+          write$: network.write$,
+          useStore: network.useStore,
+        });
+      }
+    }
+    const unmountPromise = mount();
+    return () => {
+      unmountPromise.then((unmount) => unmount?.());
+    };
+  }, [
+    appAccountClient,
+    network.latestBlock$,
+    network.storedBlockLogs$,
+    network.useStore,
+    network.write$,
+    worldContract.abi,
+    worldContract.address,
+  ]);
+
+  const tasks = network.useStore((state) => {
+    const records = Object.values(state.getRecords(network.tables.Tasks));
     records.sort((a, b) => Number(a.value.createdAt - b.value.createdAt));
     return records;
   });
-
-  function handleToggle(id: Hex) {
-    if (state.status === "write") {
-      return state.systemCalls.toggleTask(id);
-    }
-  }
-
-  function handleDelete(id: Hex) {
-    if (state.status === "write") {
-      return state.systemCalls.deleteTask(id);
-    }
-  }
-
-  function handleAdd(id: string) {
-    if (state.status === "write") {
-      return state.systemCalls.addTask(id);
-    }
-  }
 
   return (
     <>
       <LoginButton />
 
       <ConnectButton />
-      {mainWallet && <LatticeKitDialog />}
 
       <table>
         <tbody>
@@ -60,7 +88,7 @@ export const App = () => {
 
                     checkbox.disabled = true;
                     try {
-                      await handleToggle(task.key.id);
+                      await systemCalls.toggleTask(task.key.id);
                     } finally {
                       checkbox.disabled = false;
                     }
@@ -80,7 +108,7 @@ export const App = () => {
                     const button = event.currentTarget;
                     button.disabled = true;
                     try {
-                      await handleDelete(task.key.id);
+                      await systemCalls.deleteTask(task.key.id);
                     } finally {
                       button.disabled = false;
                     }
@@ -111,7 +139,7 @@ export const App = () => {
 
                   fieldset.disabled = true;
                   try {
-                    await handleAdd(desc);
+                    await systemCalls.addTask(desc);
                     form.reset();
                   } finally {
                     fieldset.disabled = false;

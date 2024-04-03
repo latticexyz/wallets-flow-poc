@@ -1,41 +1,13 @@
-/*
- * The MUD client code is built on top of viem
- * (https://viem.sh/docs/getting-started.html).
- * This line imports the functions we need from it.
- */
-import { createPublicClient, Hex } from "viem";
+import { Hex } from "viem";
 import { syncToZustand } from "@latticexyz/store-sync/zustand";
-import { getNetworkConfig } from "./getNetworkConfig";
 import { ContractWrite } from "@latticexyz/common";
 import { Subject } from "rxjs";
-import modulesConfig from "@latticexyz/world-modules/mud.config";
-
-/*
- * Import our MUD config, which includes strong types for
- * our tables and other config options. We use this to generate
- * things like RECS components and get back strong types for them.
- *
- * See https://mud.dev/templates/typescript/contracts#mudconfigts
- * for the source of this information.
- */
 import mudConfig from "contracts/mud.config";
-import { getClientOptions } from "./getClientOptions";
-import { resolveConfig } from "@latticexyz/store/config";
-import { storeToV1 } from "@latticexyz/store/config/v2";
-
-const resolvedModulesConfig = resolveConfig(storeToV1(modulesConfig));
+import { networkConfig, publicClient } from "../common";
 
 export type SetupNetworkResult = Awaited<ReturnType<typeof setupNetwork>>;
 
 export async function setupNetwork() {
-  const networkConfig = await getNetworkConfig();
-
-  /*
-   * Create a viem public (read only) client
-   * (https://viem.sh/docs/clients/public.html)
-   */
-  const clientOptions = getClientOptions(networkConfig);
-  const publicClient = createPublicClient(clientOptions);
   /*
    * Create an observable for contract writes that we can
    * pass into MUD dev tools for transaction observability.
@@ -53,14 +25,12 @@ export async function setupNetwork() {
     address: networkConfig.worldAddress as Hex,
     publicClient,
     startBlock: BigInt(networkConfig.initialBlockNumber),
-    tables: { UserDelegationNonces: resolvedModulesConfig.tables.UserDelegationNonces },
   });
 
   return {
     write$,
     tables,
     useStore,
-    publicClient,
     latestBlock$,
     storedBlockLogs$,
     waitForTransaction,
