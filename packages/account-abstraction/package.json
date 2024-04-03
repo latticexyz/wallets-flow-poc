@@ -5,10 +5,10 @@
   "license": "MIT",
   "scripts": {
     "build": "tsc",
-    "dev": "wait-port localhost:8545 && pnpm run deploy:contracts && pnpm run start:alto",
+    "dev": "wait-port 127.0.0.1:8545 && pnpm run deploy:contracts && pnpm run start:alto",
     "start:alto": "pushd node_modules/alto; pnpm install; popd; pnpm alto run --config ./config.localhost.json",
     "deploy:contracts": "tsx scripts/deployContracts.ts && pnpm run deploy:gas-tank",
-    "deploy:gas-tank": "cd ./node_modules/@latticexyz/gas-tank/packages/contracts && pnpm install && pnpm mud deploy --rpc http://localhost:8545 --salt '0x00'"
+    "deploy:gas-tank": "cd ./node_modules/@latticexyz/gas-tank/packages/contracts && pnpm install && pnpm mud deploy --rpc http://127.0.0.1:8545 --salt '0x00'"
   },
   "dependencies": {
     "@latticexyz/cli": "^2.0.4",
