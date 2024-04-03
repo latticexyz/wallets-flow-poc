@@ -1,12 +1,12 @@
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { hashMessage } from "viem";
 import { useSignMessage } from "wagmi";
-import { privateKeyToAccount } from "viem/accounts";
-import { store } from "./store";
+import { useAppSigner } from "./useAppSigner";
 
 // TODO: load/store private key in localStorage
 
 export function AppSignerDialogContent() {
+  const [, setAppSigner] = useAppSigner();
   const { signMessageAsync, isPending } = useSignMessage();
 
   return (
@@ -30,8 +30,7 @@ export function AppSignerDialogContent() {
               // TODO: improve message, include location.origin
               message: "Create app-signer",
             });
-            const appSignerAccount = privateKeyToAccount(hashMessage(signature));
-            store.setState({ appSignerAccount });
+            setAppSigner(hashMessage(signature));
           }}
         >
           Generate signer

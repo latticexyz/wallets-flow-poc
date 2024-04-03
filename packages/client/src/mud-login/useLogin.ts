@@ -5,6 +5,7 @@ import { store } from "./store";
 import { useStore } from "./useStore";
 import { useAppAccountClient } from "./useAppAccountClient";
 import { LoginRequirement, loginRequirements } from "./common";
+import { useAppSigner } from "./useAppSigner";
 
 // TODO: split this out into multiple hooks
 export type UseLoginResult = {
@@ -23,7 +24,7 @@ export function useLogin(): UseLoginResult {
   const { status: accountStatus } = useAccount();
 
   const loginDialogOpen = useStore((state) => state.dialogOpen);
-  const appSignerAccount = useStore((state) => state.appSignerAccount);
+  const [appSignerAccount] = useAppSigner();
   const gasAllowance = useStore((state) => state.mockGasAllowance);
   const appAccountClient = useAppAccountClient();
   const hasDelegation = useStore((state) => state.hasDelegation);

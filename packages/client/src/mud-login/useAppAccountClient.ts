@@ -9,13 +9,13 @@ import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { call, getTransactionCount } from "viem/actions";
 import { MOCK_PAYMASTER_ADDRESS } from "account-abstraction/src/deployPaymaster";
 import { useLoginConfig } from "./Context";
-import { useStore } from "./useStore";
 import { entryPoint } from "./common";
+import { useAppSigner } from "./useAppSigner";
 
 export function useAppAccountClient():
   | SmartAccountClient<typeof entryPoint, Transport, Chain, SmartAccount<typeof entryPoint>>
   | undefined {
-  const appSignerAccount = useStore((state) => state.appSignerAccount);
+  const [appSignerAccount] = useAppSigner();
   const { chainId, worldAddress } = useLoginConfig();
   const { address: userAddress } = useAccount();
   const publicClient = usePublicClient({ chainId });

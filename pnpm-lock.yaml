@@ -135,6 +135,9 @@ importers:
       rxjs:
         specifier: 7.5.5
         version: 7.5.5
+      usehooks-ts:
+        specifier: ^3.0.2
+        version: 3.0.2(react@18.2.0)
       viem:
         specifier: 2.7.12
         version: 2.7.12(typescript@5.4.2)(zod@3.22.4)
@@ -10760,6 +10763,16 @@ packages:
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
+      react: 18.2.0
+    dev: false
+
+  /usehooks-ts@3.0.2(react@18.2.0):
+    resolution: {integrity: sha512-qJScCj8YOxa8RV3Iz2T+2IsydLG0EID5FouTGE7aNFEpFlCXmRrnJiPCESDArKr1FLTaUQSfDQ43UDn7yMLExw==}
+    engines: {node: '>=16.15.0'}
+    peerDependencies:
+      react: ^16.8.0  || ^17 || ^18
+    dependencies:
+      lodash.debounce: 4.0.8
       react: 18.2.0
     dev: false
 
