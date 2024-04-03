@@ -4,6 +4,9 @@ import { deployEntryPointSimulations } from "../src/deployEntryPointSimulations"
 import { MOCK_PAYMASTER_ADDRESS, deployPaymaster } from "../src/deployPaymaster";
 import { deploySimpleAccountFactory } from "../src/deploySimpleAccountFactory";
 import { getContract, parseAbi, parseEther } from "viem";
+import { waitForTransactionReceipt, writeContract } from "viem/actions";
+import GasTankAbi from "@latticexyz/gas-tank/packages/contracts/out/IWorld.sol/IWorld.abi.json";
+import { getGasTankAddress } from "../src/gasTank";
 
 export async function deployContracts() {
   await deployEntryPoint();
@@ -17,10 +20,28 @@ export async function deployContracts() {
     client: deployerClient,
   });
 
-  const depositHash = await mockPaymasterContract.write.deposit({
-    value: parseEther("50"),
-  });
-  console.log("funded paymaster", depositHash);
+  console.log(
+    "funded mock paymaster",
+    await waitForTransactionReceipt(deployerClient, {
+      hash: await mockPaymasterContract.write.deposit({
+        value: parseEther("50"),
+      }),
+    }),
+  );
+
+  console.log(
+    "funded gas tank",
+    await waitForTransactionReceipt(deployerClient, {
+      hash: await writeContract(deployerClient, {
+        address: getGasTankAddress(deployerClient.chain.id)!,
+        abi: GasTankAbi,
+        functionName: "depositTo",
+        // TODO: replace with actual address
+        args: ["0xd90807BB3bd1F7B4486ab94F5dc6eF9759e02aFa"],
+        value: parseEther("50"),
+      }),
+    }),
+  );
 }
 
 deployContracts();

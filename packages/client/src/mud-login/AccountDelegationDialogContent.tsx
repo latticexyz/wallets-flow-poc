@@ -135,7 +135,9 @@ export function AccountDelegationDialogContent() {
       table: modulesConfig.tables.CallWithSignatureNonces,
       key: { signer: userAccount.address },
     });
+    console.log("got nonce", record);
 
+    console.log("registerDelegation");
     const hash = await registerUnlimitedDelegationWithSignature(
       chainId,
       worldAddress,
@@ -144,13 +146,16 @@ export function AccountDelegationDialogContent() {
       appAccountClient.account.address,
       record.nonce,
     );
+    console.log("registerDelegation tx", hash);
 
     const receipt = await waitForTransactionReceipt(publicClient, { hash });
+    console.log("registerDelegation receipt", receipt);
     if (receipt.status === "reverted") {
       console.error("Failed to register delegation.", receipt);
       throw new Error("Failed to register delegation.");
     }
 
+    // TODO: figure out why this isn't dismissing the modal
     store.setState({ hasDelegation: true });
   });
 
@@ -160,6 +165,8 @@ export function AccountDelegationDialogContent() {
       <Dialog.Description size="2" mb="4">
         Delegation description
       </Dialog.Description>
+
+      {registerDelegationResult.status === "rejected" ? <>Error: {String(registerDelegationResult.reason)}</> : null}
 
       <Flex gap="3" mt="4" justify="end">
         <Dialog.Close>

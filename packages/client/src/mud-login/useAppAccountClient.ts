@@ -7,10 +7,13 @@ import { SmartAccountClient, createSmartAccountClient } from "permissionless";
 import { SmartAccount, signerToSimpleSmartAccount } from "permissionless/accounts";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { call, getTransactionCount } from "viem/actions";
-import { MOCK_PAYMASTER_ADDRESS } from "account-abstraction/src/deployPaymaster";
+import { getGasTankAddress } from "account-abstraction/src/gasTank";
 import { useLoginConfig } from "./Context";
 import { entryPoint } from "./common";
 import { useAppSigner } from "./useAppSigner";
+import { networkConfig } from "../common";
+
+const gasTankAddress = getGasTankAddress(networkConfig.chainId);
 
 export function useAppAccountClient():
   | SmartAccountClient<typeof entryPoint, Transport, Chain, SmartAccount<typeof entryPoint>>
@@ -47,14 +50,14 @@ export function useAppAccountClient():
             const gasEstimates = await pimlicoBundlerClient.estimateUserOperationGas({
               userOperation: {
                 ...userOperation,
-                paymaster: MOCK_PAYMASTER_ADDRESS,
+                paymaster: gasTankAddress,
                 paymasterData: "0x",
               },
             });
 
             return {
               paymasterData: "0x",
-              paymaster: MOCK_PAYMASTER_ADDRESS,
+              paymaster: gasTankAddress,
               ...gasEstimates,
             };
           },

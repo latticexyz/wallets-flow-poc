@@ -1,2 +1,6 @@
-// Gas tank is locally deployed to this address (deterministic based on deployer address, bytecode, and salt 0x00)
-export const GAS_TANK_ADDRESS = "0x51f1cdd92d92da8ec29d6b680331dbfadcb2681f";
+import worlds from "@latticexyz/gas-tank/packages/contracts/worlds.json";
+import { Hex } from "viem";
+
+export function getGasTankAddress(chainId: number): Hex | undefined {
+  return worlds[chainId]?.address as never;
+}
