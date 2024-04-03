@@ -6,10 +6,11 @@ import modulesConfig from "@latticexyz/world-modules/mud.config";
 
 import { getRecord } from "./getRecord";
 import { useCreatePromise } from "./useCreatePromise";
-import { Account, Address, Chain, Hex, Transport, WalletClient } from "viem";
+import { Account, Address, Chain, Hex, Transport, WalletClient, encodeFunctionData } from "viem";
 import { signTypedData, waitForTransactionReceipt, writeContract } from "viem/actions";
-import { delegationWithSignatureTypes } from "@latticexyz/world/internal";
-import DelegationAbi from "@latticexyz/world-modules/out/IUnstable_DelegationWithSignatureSystem.sol/IUnstable_DelegationWithSignatureSystem.abi.json";
+import { callWithSignatureTypes } from "@latticexyz/world/internal";
+import CallWithSignatureAbi from "@latticexyz/world-modules/out/IUnstable_CallWithSignatureSystem.sol/IUnstable_CallWithSignatureSystem.abi.json";
+import IBaseWorldAbi from "@latticexyz/world/out/IBaseWorld.sol/IBaseWorld.abi.json";
 import { SmartAccount } from "permissionless/accounts";
 import { entryPoint, unlimitedDelegationControlId } from "./common";
 import { SmartAccountClient } from "permissionless";
@@ -18,15 +19,15 @@ import { useStore } from "./useStore";
 import { usePromise } from "@latticexyz/react";
 import { useMemo } from "react";
 import { store } from "./store";
+import { resourceToHex } from "@latticexyz/common";
 
 // TODO: move this out and turn args into object
-async function signDelegationMessage(
+async function signCall(
   chainId: number,
   worldAddress: Address,
   walletClient: WalletClient<Transport, Chain, Account>,
-  delegatee: Hex,
-  delegationControlId: Hex,
-  initCallData: Hex,
+  systemId: Hex,
+  callData: Hex,
   nonce: bigint,
 ) {
   return await signTypedData(walletClient, {
@@ -35,13 +36,12 @@ async function signDelegationMessage(
       chainId,
       verifyingContract: worldAddress,
     },
-    types: delegationWithSignatureTypes,
-    primaryType: "Delegation",
+    types: callWithSignatureTypes,
+    primaryType: "Call",
     message: {
-      delegatee,
-      delegationControlId: delegationControlId,
-      initCallData,
-      delegator: walletClient.account.address,
+      signer: walletClient.account.address,
+      systemId,
+      callData,
       nonce,
     },
   });
@@ -58,21 +58,20 @@ async function registerDelegationWithSignature(
   initCallData: Hex,
   nonce: bigint,
 ) {
-  const signature = await signDelegationMessage(
-    chainId,
-    worldAddress,
-    walletClient,
-    delegatee,
-    delegationControlId,
-    initCallData,
-    nonce,
-  );
+  const systemId = resourceToHex({ type: "system", namespace: "", name: "Registration" });
+  const callData = encodeFunctionData({
+    abi: IBaseWorldAbi,
+    functionName: "registerDelegation",
+    args: [delegatee, delegationControlId, initCallData],
+  });
+
+  const signature = await signCall(chainId, worldAddress, walletClient, systemId, callData, nonce);
 
   return writeContract(appAccountClient, {
     address: worldAddress,
-    abi: DelegationAbi,
-    functionName: "registerDelegationWithSignature",
-    args: [delegatee, delegationControlId, initCallData, walletClient.account.address, signature],
+    abi: CallWithSignatureAbi,
+    functionName: "callWithSignature",
+    args: [walletClient.account.address, systemId, callData, signature],
   });
 }
 
@@ -133,8 +132,8 @@ export function AccountDelegationDialogContent() {
 
     const record = await getRecord(publicClient, {
       storeAddress: worldAddress,
-      table: modulesConfig.tables.UserDelegationNonces,
-      key: { delegator: userAccount.address },
+      table: modulesConfig.tables.CallWithSignatureNonces,
+      key: { signer: userAccount.address },
     });
 
     const hash = await registerUnlimitedDelegationWithSignature(
