@@ -3,8 +3,6 @@ import { hashMessage } from "viem";
 import { useSignMessage } from "wagmi";
 import { useAppSigner } from "./useAppSigner";
 
-// TODO: load/store private key in localStorage
-
 export function AppSignerDialogContent() {
   const [, setAppSigner] = useAppSigner();
   const { signMessageAsync, isPending } = useSignMessage();
