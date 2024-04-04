@@ -3,9 +3,9 @@ import { useCallback, useMemo } from "react";
 import { useAccount } from "wagmi";
 import { store } from "./store";
 import { useStore } from "./useStore";
-import { useAppAccountClient } from "./useAppAccountClient";
 import { LoginRequirement, loginRequirements } from "./common";
 import { useAppSigner } from "./useAppSigner";
+import { useHasDelegation } from "./useHasDelegation";
 
 // TODO: split this out into multiple hooks
 export type UseLoginResult = {
@@ -26,8 +26,7 @@ export function useLogin(): UseLoginResult {
   const loginDialogOpen = useStore((state) => state.dialogOpen);
   const [appSignerAccount] = useAppSigner();
   const gasAllowance = useStore((state) => state.mockGasAllowance);
-  const appAccountClient = useAppAccountClient();
-  const hasDelegation = useStore((state) => state.hasDelegation);
+  const hasDelegation = useHasDelegation();
 
   const openLoginDialog = useCallback(() => {
     store.setState({ dialogOpen: true });
@@ -46,11 +45,13 @@ export function useLogin(): UseLoginResult {
       connectedWallet: () => accountStatus === "connected",
       appSigner: () => appSignerAccount != null,
       gasAllowance: () => gasAllowance != null && gasAllowance > 0n,
-      accountDelegation: () => appAccountClient != null && hasDelegation === true,
+      accountDelegation: () => hasDelegation === true,
     } as const satisfies Record<LoginRequirement, () => boolean>;
 
     return loginRequirements.filter((requirement) => !satisfiesRequirement[requirement]());
-  }, [accountStatus, appAccountClient, appSignerAccount, gasAllowance, hasDelegation]);
+  }, [accountStatus, appSignerAccount, gasAllowance, hasDelegation]);
+
+  console.log("requirements", requirements);
 
   return useMemo(
     () => ({

@@ -11,9 +11,6 @@ import { getGasTankAddress } from "account-abstraction/src/gasTank";
 import { useLoginConfig } from "./Context";
 import { entryPoint } from "./common";
 import { useAppSigner } from "./useAppSigner";
-import { networkConfig } from "../common";
-
-const gasTankAddress = getGasTankAddress(networkConfig.chainId);
 
 export function useAppAccountClient():
   | SmartAccountClient<typeof entryPoint, Transport, Chain, SmartAccount<typeof entryPoint>>
@@ -22,6 +19,8 @@ export function useAppAccountClient():
   const { chainId, worldAddress } = useLoginConfig();
   const { address: userAddress } = useAccount();
   const publicClient = usePublicClient({ chainId });
+
+  const gasTankAddress = getGasTankAddress(chainId);
 
   const result = usePromise(
     useMemo(async () => {
@@ -88,6 +87,10 @@ export function useAppAccountClient():
   );
 
   // TODO: handle errors
+
+  if (result.status === "rejected") {
+    console.log("failed to get app account client", result.reason);
+  }
 
   return result.status === "fulfilled" ? result.value : undefined;
 }

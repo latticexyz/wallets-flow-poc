@@ -2,7 +2,7 @@ import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useAppAccountClient } from "./useAppAccountClient";
 import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
 import { useLoginConfig } from "./Context";
-import modulesConfig from "@latticexyz/world-modules/mud.config";
+import modulesConfig from "@latticexyz/world-modules/internal/mud.config";
 
 import { getRecord } from "./getRecord";
 import { useCreatePromise } from "./useCreatePromise";
@@ -14,10 +14,6 @@ import IBaseWorldAbi from "@latticexyz/world/out/IBaseWorld.sol/IBaseWorld.abi.j
 import { SmartAccount } from "permissionless/accounts";
 import { entryPoint, unlimitedDelegationControlId } from "./common";
 import { SmartAccountClient } from "permissionless";
-import { hasDelegation as checkHasDelegation } from "./hasDelegation";
-import { useStore } from "./useStore";
-import { usePromise } from "@latticexyz/react";
-import { useMemo } from "react";
 import { store } from "./store";
 import { resourceToHex } from "@latticexyz/common";
 
@@ -102,27 +98,7 @@ export function AccountDelegationDialogContent() {
   const { data: walletClient } = useWalletClient({ chainId });
   const userAccount = useAccount();
   const appAccountClient = useAppAccountClient();
-  const cacheHasDelegation = useStore((state) => state.hasDelegation);
   const { switchChain, isPending: switchChainPending } = useSwitchChain();
-
-  const hasDelegationResult = usePromise(
-    useMemo(async () => {
-      if (cacheHasDelegation != null) return cacheHasDelegation;
-      if (!publicClient) return false;
-      if (!userAccount.address) return false;
-      if (!appAccountClient) return false;
-
-      const hasDelegation = await checkHasDelegation({
-        publicClient,
-        worldAddress,
-        userAccountAddress: userAccount.address,
-        appAccountAddress: appAccountClient.account.address,
-      });
-
-      store.setState({ hasDelegation });
-      return hasDelegation;
-    }, [appAccountClient, cacheHasDelegation, publicClient, userAccount.address, worldAddress]),
-  );
 
   const [registerDelegationResult, registerDelegation] = useCreatePromise(async () => {
     if (!publicClient) throw new Error("Public client not ready. Not connected?");
@@ -156,7 +132,7 @@ export function AccountDelegationDialogContent() {
     }
 
     // TODO: figure out why this isn't dismissing the modal
-    store.setState({ hasDelegation: true });
+    store.setState({ delegationTransaction: hash });
   });
 
   return (
@@ -179,10 +155,7 @@ export function AccountDelegationDialogContent() {
             Switch chain
           </Button>
         ) : (
-          <Button
-            loading={hasDelegationResult.status === "pending" || registerDelegationResult.status === "pending"}
-            onClick={registerDelegation}
-          >
+          <Button loading={registerDelegationResult.status === "pending"} onClick={registerDelegation}>
             Set up delegation
           </Button>
         )}

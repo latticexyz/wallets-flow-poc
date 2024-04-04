@@ -37,7 +37,7 @@ export const App = () => {
           publicClient,
           // TODO: fix type, also make walletClient optional?
           // TODO: allow multiple calls to mount to update
-          walletClient: appAccountClient,
+          walletClient: appAccountClient!,
           latestBlock$: network.latestBlock$,
           storedBlockLogs$: network.storedBlockLogs$,
           worldAddress: worldContract.address,
