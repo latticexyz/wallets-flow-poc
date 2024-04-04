@@ -5,10 +5,10 @@ import { useMemo } from "react";
 
 export const storageKey = "mud:appSigner:privateKey";
 
-export function useAppSigner(): [PrivateKeyAccount | null, (privateKey: Hex) => void] {
-  const [privateKey, setPrivateKey] = useLocalStorage<Hex | null>(storageKey, null);
+export function useAppSigner(): [PrivateKeyAccount | undefined, (privateKey: Hex) => void] {
+  const [privateKey, setPrivateKey] = useLocalStorage<Hex | undefined>(storageKey, undefined);
   return useMemo(
-    () => [privateKey ? privateKeyToAccount(privateKey) : null, setPrivateKey],
+    () => [privateKey ? privateKeyToAccount(privateKey) : undefined, setPrivateKey],
     [privateKey, setPrivateKey],
   );
 }

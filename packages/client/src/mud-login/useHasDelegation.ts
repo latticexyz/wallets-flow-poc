@@ -1,51 +1,49 @@
-import { usePromise } from "@latticexyz/react";
-import { useMemo } from "react";
 import { useStore } from "./useStore";
 import { useAccount, usePublicClient } from "wagmi";
-import { useAppAccountClient } from "./useAppAccountClient";
 import { useLoginConfig } from "./Context";
 import { hasDelegation as checkHasDelegation } from "./hasDelegation";
+import { useQuery } from "@tanstack/react-query";
+import { useAppAccount } from "./useAppAccount";
+import { useAppSigner } from "./useAppSigner";
 
-export function useHasDelegation(): boolean | null {
+export function useHasDelegation(): boolean | undefined {
   const { chainId, worldAddress } = useLoginConfig();
   const publicClient = usePublicClient({ chainId });
-  const delegationTransaction = useStore((state) => state.delegationTransaction);
   const userAccount = useAccount();
-  const appAccountClient = useAppAccountClient();
+  const [appSignerAccount] = useAppSigner();
+  const appAccount = useAppAccount({ publicClient, appSignerAccount });
+  const delegationTransaction = useStore((state) => state.delegationTransaction);
 
-  const hasDelegationResult = usePromise(
-    useMemo(async () => {
-      console.log("checking if has delegation");
+  const userAccountAddress = userAccount.address;
+  const appAccountAddress = appAccount.data?.address;
 
-      // this is here to satisfy linter so this lands in useMemo dependency array
-      // it's used to retrigger this check when the transaction changes
-      delegationTransaction;
+  const queryKey = [
+    "mud:hasDelegation",
+    publicClient?.chain.id,
+    worldAddress,
+    userAccountAddress,
+    appAccountAddress,
+    delegationTransaction,
+  ] as const;
 
-      if (!publicClient) {
-        console.log("no public client");
-        return false;
-      }
-      if (!userAccount.address) {
-        console.log("no user account");
-        return false;
-      }
-      if (!appAccountClient) {
-        console.log("no app account");
-        return false;
-      }
-
-      const hasDelegation = await checkHasDelegation({
-        publicClient,
-        worldAddress,
-        userAccountAddress: userAccount.address,
-        appAccountAddress: appAccountClient.account.address,
-      });
-
-      console.log("has delegation?", hasDelegation);
-
-      return hasDelegation;
-    }, [appAccountClient, delegationTransaction, publicClient, userAccount.address, worldAddress]),
+  const result = useQuery(
+    publicClient && worldAddress && userAccountAddress && appAccountAddress
+      ? {
+          queryKey,
+          queryFn: () =>
+            checkHasDelegation({
+              publicClient,
+              worldAddress,
+              userAccountAddress,
+              appAccountAddress,
+            }),
+          staleTime: 1000 * 60 * 5,
+        }
+      : {
+          queryKey,
+          enabled: false,
+        },
   );
 
-  return hasDelegationResult.status === "fulfilled" ? hasDelegationResult.value : null;
+  return result.data;
 }

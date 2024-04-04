@@ -1,11 +1,13 @@
 import { Button } from "@radix-ui/themes";
-import { useLogin } from "./useLogin";
+import { useLoginDialog } from "./useLoginDialog";
 import { LoginDialog } from "./LoginDialog";
+import { useLoginRequirements } from "./useLoginRequirements";
 
 export function LoginButton() {
-  const { currentRequirement, openConnectModal, openLoginDialog, toggleLoginDialog, loginDialogOpen } = useLogin();
+  const { requirement } = useLoginRequirements();
+  const { openConnectModal, openLoginDialog, toggleLoginDialog, loginDialogOpen } = useLoginDialog();
 
-  if (currentRequirement === "connectedWallet") {
+  if (requirement === "connectedWallet") {
     return (
       <Button onClick={openConnectModal} loading={!openConnectModal}>
         Connect wallet
@@ -15,29 +17,29 @@ export function LoginButton() {
 
   // TODO: refactor so we always display the login dialog for any of these to reduce the close/open transition when moving between states
 
-  if (currentRequirement === "appSigner") {
+  if (requirement === "appSigner") {
     return (
       <>
         <Button onClick={openLoginDialog}>Set up</Button>
-        <LoginDialog requirement={currentRequirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
+        <LoginDialog requirement={requirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
       </>
     );
   }
 
-  if (currentRequirement === "gasAllowance") {
+  if (requirement === "gasAllowance") {
     return (
       <>
         <Button onClick={openLoginDialog}>Top up</Button>
-        <LoginDialog requirement={currentRequirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
+        <LoginDialog requirement={requirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
       </>
     );
   }
 
-  if (currentRequirement === "accountDelegation") {
+  if (requirement === "accountDelegation") {
     return (
       <>
         <Button onClick={openLoginDialog}>Log in</Button>
-        <LoginDialog requirement={currentRequirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
+        <LoginDialog requirement={requirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
       </>
     );
   }

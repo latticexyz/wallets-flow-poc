@@ -16,7 +16,7 @@ export function useAppAccountClient(): AppAccountClient | undefined {
   const { chainId, worldAddress } = useLoginConfig();
   const { address: userAddress } = useAccount();
   const publicClient = usePublicClient({ chainId });
-  const { data: appAccount } = useAppAccount();
+  const { data: appAccount } = useAppAccount({ publicClient, appSignerAccount });
 
   const gasTankAddress = getGasTankAddress(chainId);
 
