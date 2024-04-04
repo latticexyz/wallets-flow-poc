@@ -1,12 +1,14 @@
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { parseEther } from "viem";
-import { useAccount, useWriteContract } from "wagmi";
+import { useAccount, useConfig, useWriteContract } from "wagmi";
 import { useLoginConfig } from "./Context";
 import GasTankAbi from "@latticexyz/gas-tank/out/IWorld.sol/IWorld.abi.json";
 import { getGasTankBalanceKey } from "./useGasTankBalance";
 import { queryClient } from "../common";
+import { waitForTransactionReceipt } from "wagmi/actions";
 
 export function GasAllowanceDialogContent() {
+  const wagmiConfig = useConfig();
   const { chainId, gasTankAddress } = useLoginConfig();
   const userAccount = useAccount();
   const userAccountAddress = userAccount.address;
@@ -27,13 +29,19 @@ export function GasAllowanceDialogContent() {
           onClick={async () => {
             if (!userAccountAddress) return;
 
-            await writeContractAsync({
+            const hash = await writeContractAsync({
               address: gasTankAddress,
               abi: GasTankAbi,
               functionName: "depositTo",
               args: [userAccountAddress],
               value: parseEther("0.01"),
             });
+            await waitForTransactionReceipt(wagmiConfig, { hash });
+            // invalidating this cache will cause the balance to be fetched again
+            // but this could fail for load balanced RPCs that aren't fully in sync
+            // where the one we got the receipt one is ahead of the one that will
+            // refetch the balance
+            // TODO: figure out a better fix? maybe just assume we're good to go?
             queryClient.invalidateQueries({
               queryKey: getGasTankBalanceKey({ chainId, gasTankAddress, userAccountAddress }),
             });
