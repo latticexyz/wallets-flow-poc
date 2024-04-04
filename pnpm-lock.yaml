@@ -46,7 +46,7 @@ importers:
         version: 2.0.4(google-protobuf@3.21.2)
       '@latticexyz/gas-tank':
         specifier: git+https://github.com/latticexyz/gas-tank.git#bacfb77
-        version: git@github.com+latticexyz/gas-tank/bacfb77
+        version: git/github.com+latticexyz/gas-tank/bacfb77
       alto:
         specifier: git+https://github.com/latticexyz/alto.git#3192a9a
         version: github.com/latticexyz/alto/3192a9a
@@ -12432,12 +12432,11 @@ packages:
       use-sync-external-store: 1.2.0(react@18.2.0)
     dev: false
 
-  git@github.com+latticexyz/gas-tank/bacfb77:
+  git/github.com+latticexyz/gas-tank/bacfb77:
     resolution: {commit: bacfb77, repo: git@github.com:latticexyz/gas-tank.git, type: git}
     name: mud-template-vanilla
     version: 0.0.0
     engines: {node: 18.x, pnpm: 8.x}
-    prepare: true
     requiresBuild: true
     dev: false
 
@@ -12459,6 +12458,5 @@ packages:
     version: 0.0.1
     engines: {node: '>=18.0.0'}
     hasBin: true
-    prepare: true
     requiresBuild: true
     dev: false

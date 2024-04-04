@@ -11,9 +11,7 @@ import { signTypedData, waitForTransactionReceipt, writeContract } from "viem/ac
 import { callWithSignatureTypes } from "@latticexyz/world/internal";
 import CallWithSignatureAbi from "@latticexyz/world-modules/out/IUnstable_CallWithSignatureSystem.sol/IUnstable_CallWithSignatureSystem.abi.json";
 import IBaseWorldAbi from "@latticexyz/world/out/IBaseWorld.sol/IBaseWorld.abi.json";
-import { SmartAccount } from "permissionless/accounts";
-import { entryPoint, unlimitedDelegationControlId } from "./common";
-import { SmartAccountClient } from "permissionless";
+import { AppAccountClient, unlimitedDelegationControlId } from "./common";
 import { store } from "./store";
 import { resourceToHex } from "@latticexyz/common";
 
@@ -48,7 +46,7 @@ async function registerDelegationWithSignature(
   chainId: number,
   worldAddress: Address,
   walletClient: WalletClient<Transport, Chain, Account>,
-  appAccountClient: SmartAccountClient<typeof entryPoint, Transport, Chain, SmartAccount<typeof entryPoint>>,
+  appAccountClient: AppAccountClient,
   delegatee: Hex,
   delegationControlId: Hex,
   initCallData: Hex,
@@ -76,7 +74,7 @@ function registerUnlimitedDelegationWithSignature(
   chainId: number,
   worldAddress: Address,
   walletClient: WalletClient<Transport, Chain, Account>,
-  appAccountClient: SmartAccountClient<typeof entryPoint, Transport, Chain, SmartAccount<typeof entryPoint>>,
+  appAccountClient: AppAccountClient,
   delegatee: Hex,
   nonce: bigint,
 ) {
