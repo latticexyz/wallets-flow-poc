@@ -1,10 +1,38 @@
 import { useStore } from "./useStore";
 import { useAccount, usePublicClient } from "wagmi";
 import { useLoginConfig } from "./Context";
-import { hasDelegation as checkHasDelegation } from "./hasDelegation";
 import { useQuery } from "@tanstack/react-query";
 import { useAppAccount } from "./useAppAccount";
 import { useAppSigner } from "./useAppSigner";
+import { getRecord } from "./getRecord";
+import { Address } from "abitype";
+import { PublicClient } from "viem";
+import { unlimitedDelegationControlId } from "./common";
+import worldConfig from "@latticexyz/world/mud.config";
+
+export type HasDelegationOptions = {
+  publicClient: PublicClient;
+  worldAddress: Address;
+  userAccountAddress: Address;
+  appAccountAddress: Address;
+};
+
+export async function hasDelegation({
+  publicClient,
+  worldAddress,
+  userAccountAddress,
+  appAccountAddress,
+}: HasDelegationOptions): Promise<boolean> {
+  const record = await getRecord(publicClient, {
+    storeAddress: worldAddress,
+    table: worldConfig.tables.world__UserDelegationControl,
+    key: {
+      delegator: userAccountAddress,
+      delegatee: appAccountAddress,
+    },
+  });
+  return record.delegationControlId === unlimitedDelegationControlId;
+}
 
 export function useHasDelegation(): boolean | undefined {
   const { chainId, worldAddress } = useLoginConfig();
@@ -31,7 +59,7 @@ export function useHasDelegation(): boolean | undefined {
       ? {
           queryKey,
           queryFn: () =>
-            checkHasDelegation({
+            hasDelegation({
               publicClient,
               worldAddress,
               userAccountAddress,
