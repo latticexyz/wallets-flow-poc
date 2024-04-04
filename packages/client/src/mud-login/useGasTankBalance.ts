@@ -12,6 +12,14 @@ export type GetGasTankBalanceOptions = {
   userAccountAddress: Address;
 };
 
+export function getGasTankBalanceKey(data: {
+  chainId: number;
+  gasTankAddress: Address;
+  userAccountAddress: Address | undefined;
+}) {
+  return ["mud:getGasTankBalance", data] as const;
+}
+
 export async function getGasTankBalance({
   publicClient,
   worldAddress,
@@ -34,7 +42,7 @@ export function useGasTankBalance(): bigint | undefined {
   const userAccount = useAccount();
   const userAccountAddress = userAccount.address;
 
-  const queryKey = ["mud:getGasTankBalance", chainId, gasTankAddress, userAccountAddress] as const;
+  const queryKey = getGasTankBalanceKey({ chainId, gasTankAddress, userAccountAddress });
 
   const result = useQuery(
     publicClient && gasTankAddress && userAccountAddress

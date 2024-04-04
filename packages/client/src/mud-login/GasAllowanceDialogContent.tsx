@@ -3,12 +3,14 @@ import { parseEther } from "viem";
 import { useAccount, useWriteContract } from "wagmi";
 import { useLoginConfig } from "./Context";
 import GasTankAbi from "@latticexyz/gas-tank/out/IWorld.sol/IWorld.abi.json";
+import { getGasTankBalanceKey } from "./useGasTankBalance";
+import { queryClient } from "../common";
 
 export function GasAllowanceDialogContent() {
-  const { gasTankAddress } = useLoginConfig();
+  const { chainId, gasTankAddress } = useLoginConfig();
   const userAccount = useAccount();
   const userAccountAddress = userAccount.address;
-  const { writeContract, isPending, error } = useWriteContract();
+  const { writeContractAsync, isPending, error } = useWriteContract();
 
   return (
     <Dialog.Content>
@@ -25,12 +27,15 @@ export function GasAllowanceDialogContent() {
           onClick={async () => {
             if (!userAccountAddress) return;
 
-            writeContract({
+            await writeContractAsync({
               address: gasTankAddress,
               abi: GasTankAbi,
               functionName: "depositTo",
               args: [userAccountAddress],
               value: parseEther("0.01"),
+            });
+            queryClient.invalidateQueries({
+              queryKey: getGasTankBalanceKey({ chainId, gasTankAddress, userAccountAddress }),
             });
           }}
         >
