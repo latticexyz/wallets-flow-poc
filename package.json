@@ -10,7 +10,8 @@
     "mud:up": "pnpm mud set-version --tag main && pnpm install",
     "prepare": "(forge --version || pnpm foundry:up)",
     "test": "pnpm recursive run test",
-    "prettier": "prettier --write '**/*.{ts,tsx,css,md,mdx,sol}'"
+    "prettier": "prettier --write '**/*.{ts,tsx,css,md,mdx,sol}'",
+    "anvil:set-balance": "cast rpc --rpc-url http://127.0.0.1:8545 anvil_setBalance 0xC9C022FCFebE730710aE93CA9247c5Ec9d9236d0 $(cast to-unit 1ether wei)"
   },
   "devDependencies": {
     "@latticexyz/cli": "link:../mud/packages/cli",

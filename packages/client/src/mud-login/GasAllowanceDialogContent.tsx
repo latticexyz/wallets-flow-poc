@@ -1,8 +1,15 @@
-import { Button, Dialog } from "@radix-ui/themes";
+import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { parseEther } from "viem";
-import { store } from "./store";
+import { useAccount, useWriteContract } from "wagmi";
+import { useLoginConfig } from "./Context";
+import GasTankAbi from "@latticexyz/gas-tank/out/IWorld.sol/IWorld.abi.json";
 
 export function GasAllowanceDialogContent() {
+  const { gasTankAddress } = useLoginConfig();
+  const userAccount = useAccount();
+  const userAccountAddress = userAccount.address;
+  const { writeContract, isPending, error } = useWriteContract();
+
   return (
     <Dialog.Content>
       <Dialog.Title>Fund Redstone Balance</Dialog.Title>
@@ -10,22 +17,28 @@ export function GasAllowanceDialogContent() {
         Fund Redstone Balance description
       </Dialog.Description>
 
-      <Button
-        style={{ width: "100%", marginTop: "15px" }}
-        onClick={() => {
-          store.setState({ mockGasAllowance: parseEther("1") });
-        }}
-      >
-        Relay.link
-      </Button>
-      <Button
-        style={{ width: "100%", marginTop: "15px" }}
-        onClick={() => {
-          store.setState({ mockGasAllowance: parseEther("1") });
-        }}
-      >
-        Redstone ETH
-      </Button>
+      {error ? <div>{String(error)}</div> : null}
+
+      <Flex direction="column" gap="2">
+        <Button
+          loading={!userAccountAddress || isPending}
+          onClick={async () => {
+            if (!userAccountAddress) return;
+
+            writeContract({
+              address: gasTankAddress,
+              abi: GasTankAbi,
+              functionName: "depositTo",
+              args: [userAccountAddress],
+              value: parseEther("0.01"),
+            });
+          }}
+        >
+          Deposit to gas tank
+        </Button>
+        <Button disabled>Relay.link</Button>
+        <Button disabled>Redstone ETH</Button>
+      </Flex>
     </Dialog.Content>
   );
 }

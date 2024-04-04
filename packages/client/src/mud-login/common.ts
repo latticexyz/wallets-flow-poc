@@ -12,6 +12,7 @@ export const smartAccountFactory = "0x91E60e0613810449d098b0b5Ec8b51A0FE8c8985";
 export type MUDLoginConfig = {
   chainId: number;
   worldAddress: Address;
+  gasTankAddress: Address;
 };
 
 export const loginRequirements = ["connectedWallet", "appSigner", "gasAllowance", "accountDelegation"] as const;

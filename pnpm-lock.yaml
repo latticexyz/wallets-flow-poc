@@ -45,8 +45,8 @@ importers:
         specifier: ^2.0.4
         version: 2.0.4(google-protobuf@3.21.2)
       '@latticexyz/gas-tank':
-        specifier: git+https://github.com/latticexyz/gas-tank.git#0065968
-        version: git@github.com+latticexyz/gas-tank/0065968
+        specifier: link:../../../gas-tank
+        version: link:../../../gas-tank
       alto:
         specifier: git+https://github.com/latticexyz/alto.git#3192a9a
         version: github.com/latticexyz/alto/3192a9a
@@ -81,6 +81,9 @@ importers:
       '@latticexyz/dev-tools':
         specifier: link:../../../mud/packages/dev-tools
         version: link:../../../mud/packages/dev-tools
+      '@latticexyz/gas-tank':
+        specifier: link:../../../gas-tank
+        version: link:../../../gas-tank
       '@latticexyz/protocol-parser':
         specifier: link:../../../mud/packages/protocol-parser
         version: link:../../../mud/packages/protocol-parser
@@ -12430,15 +12433,6 @@ packages:
       '@types/react': 18.2.22
       react: 18.2.0
       use-sync-external-store: 1.2.0(react@18.2.0)
-    dev: false
-
-  git@github.com+latticexyz/gas-tank/0065968:
-    resolution: {commit: '0065968', repo: git@github.com:latticexyz/gas-tank.git, type: git}
-    name: mud-template-vanilla
-    version: 0.0.0
-    engines: {node: 18.x, pnpm: 8.x}
-    prepare: true
-    requiresBuild: true
     dev: false
 
   github.com/dapphub/ds-test/e282159d5170298eb2455a6c05280ab5a73a4ef0:

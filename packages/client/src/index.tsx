@@ -9,6 +9,7 @@ import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
 import { Theme } from "@radix-ui/themes";
 import { MUDLoginProvider } from "./mud-login";
 import { networkConfig, queryClient, wagmiConfig } from "./common";
+import { getGasTankAddress } from "account-abstraction/src/gasTank";
 
 const rootElement = document.getElementById("react-root");
 if (!rootElement) throw new Error("React root not found");
@@ -19,7 +20,13 @@ root.render(
     <WagmiProvider config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider>
-          <MUDLoginProvider config={{ chainId: networkConfig.chainId, worldAddress: networkConfig.worldAddress }}>
+          <MUDLoginProvider
+            config={{
+              chainId: networkConfig.chainId,
+              worldAddress: networkConfig.worldAddress,
+              gasTankAddress: getGasTankAddress(networkConfig.chainId)!,
+            }}
+          >
             <MUDProvider>
               <App />
             </MUDProvider>

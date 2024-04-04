@@ -4,14 +4,11 @@ import { Hex } from "viem";
 
 export type State = {
   dialogOpen: boolean;
-  // TODO: replace with real allowance check
-  mockGasAllowance: bigint | null;
   delegationTransaction: Hex | null;
 };
 
 const initialState = {
   dialogOpen: false,
-  mockGasAllowance: null,
   delegationTransaction: null,
 } as const satisfies State;
 

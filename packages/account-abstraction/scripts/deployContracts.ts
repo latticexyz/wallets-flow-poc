@@ -5,7 +5,7 @@ import { MOCK_PAYMASTER_ADDRESS, deployPaymaster } from "../src/deployPaymaster"
 import { deploySimpleAccountFactory } from "../src/deploySimpleAccountFactory";
 import { getContract, parseAbi, parseEther } from "viem";
 import { waitForTransactionReceipt, writeContract } from "viem/actions";
-import GasTankAbi from "@latticexyz/gas-tank/packages/contracts/out/IWorld.sol/IWorld.abi.json";
+import GasTankAbi from "@latticexyz/gas-tank/out/IWorld.sol/IWorld.abi.json";
 import { getGasTankAddress } from "../src/gasTank";
 
 export async function deployContracts() {

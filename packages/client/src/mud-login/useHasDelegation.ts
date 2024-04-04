@@ -51,6 +51,7 @@ export function useHasDelegation(): boolean | undefined {
     worldAddress,
     userAccountAddress,
     appAccountAddress,
+    // TODO: clear this cache key during delegation rather than adding a tx to store
     delegationTransaction,
   ] as const;
 

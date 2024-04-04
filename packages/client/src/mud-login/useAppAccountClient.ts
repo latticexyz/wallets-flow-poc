@@ -5,7 +5,6 @@ import { callFrom } from "@latticexyz/world/internal";
 import { createSmartAccountClient } from "permissionless";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
 import { call, getTransactionCount } from "viem/actions";
-import { getGasTankAddress } from "account-abstraction/src/gasTank";
 import { useLoginConfig } from "./Context";
 import { useAppSigner } from "./useAppSigner";
 import { useAppAccount } from "./useAppAccount";
@@ -13,12 +12,10 @@ import { AppAccountClient, accountAbstractionEntryPoint } from "./common";
 
 export function useAppAccountClient(): AppAccountClient | undefined {
   const [appSignerAccount] = useAppSigner();
-  const { chainId, worldAddress } = useLoginConfig();
+  const { chainId, worldAddress, gasTankAddress } = useLoginConfig();
   const { address: userAddress } = useAccount();
   const publicClient = usePublicClient({ chainId });
   const { data: appAccount } = useAppAccount({ publicClient, appSignerAccount });
-
-  const gasTankAddress = getGasTankAddress(chainId);
 
   return useMemo(() => {
     if (!appSignerAccount) return;
