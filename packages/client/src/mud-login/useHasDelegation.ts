@@ -44,7 +44,7 @@ export function useHasDelegation(): boolean | null {
       console.log("has delegation?", hasDelegation);
 
       return hasDelegation;
-    }, [appAccountClient, delegationTransaction, userAccount.address, worldAddress]),
+    }, [appAccountClient, delegationTransaction, publicClient, userAccount.address, worldAddress]),
   );
 
   return hasDelegationResult.status === "fulfilled" ? hasDelegationResult.value : null;

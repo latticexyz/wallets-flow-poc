@@ -83,7 +83,7 @@ export function useAppAccountClient():
         );
 
       return appAccountClient;
-    }, [userAddress, appSignerAccount, worldAddress, publicClient]),
+    }, [appSignerAccount, userAddress, publicClient, worldAddress, gasTankAddress]),
   );
 
   // TODO: handle errors
