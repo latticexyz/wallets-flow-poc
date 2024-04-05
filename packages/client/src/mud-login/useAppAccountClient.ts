@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useAccount, usePublicClient } from "wagmi";
-import { http } from "viem";
+import { http, maxUint256, toHex } from "viem";
 import { callFrom } from "@latticexyz/world/internal";
 import { createSmartAccountClient } from "permissionless";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
@@ -9,6 +9,7 @@ import { useLoginConfig } from "./Context";
 import { useAppSigner } from "./useAppSigner";
 import { useAppAccount } from "./useAppAccount";
 import { AppAccountClient, accountAbstractionEntryPoint } from "./common";
+import { getUserBalanceSlot } from "./getUserBalanceSlot";
 
 export function useAppAccountClient(): AppAccountClient | undefined {
   const [appSignerAccount] = useAppSigner();
@@ -36,22 +37,31 @@ export function useAppAccountClient(): AppAccountClient | undefined {
       middleware: {
         sponsorUserOperation: async ({ userOperation }) => {
           // TODO: why does the gas estimation fail but the call succeeds if the gas limits are hard coded?
+          const gasEstimates = await pimlicoBundlerClient.estimateUserOperationGas(
+            {
+              userOperation: {
+                ...userOperation,
+                paymaster: gasTankAddress,
+                paymasterData: "0x",
+              },
+            },
+            {
+              // Pimlico's gas estimation runs with high gas limits, which can make the estimation fail if
+              // the cost would exceed the user's balance.
+              // We override the user's balance in the paymaster contract to make the gas estimation succeed.
+              [gasTankAddress]: {
+                state: { [getUserBalanceSlot(userAddress)]: toHex(maxUint256) },
+              },
+            },
+          );
 
-          // const gasEstimates = await pimlicoBundlerClient.estimateUserOperationGas({
-          //   userOperation: {
-          //     ...userOperation,
-          //     paymaster: gasTankAddress,
-          //     paymasterData: "0x",
-          //   },
-          // });
-
-          const gasEstimates = {
-            preVerificationGas: 1_000_000n,
-            verificationGasLimit: 1_000_000n,
-            callGasLimit: 1_000_000n,
-            paymasterVerificationGasLimit: 1_000_000n,
-            paymasterPostOpGasLimit: 1_000_000n,
-          };
+          // const gasEstimates = {
+          //   preVerificationGas: 1_000_000n,
+          //   verificationGasLimit: 1_000_000n,
+          //   callGasLimit: 1_000_000n,
+          //   paymasterVerificationGasLimit: 1_000_000n,
+          //   paymasterPostOpGasLimit: 1_000_000n,
+          // };
 
           return {
             paymasterData: "0x",
