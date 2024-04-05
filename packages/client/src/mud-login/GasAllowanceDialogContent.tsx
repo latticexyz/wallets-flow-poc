@@ -4,6 +4,7 @@ import { useAccount, useConfig, useWriteContract } from "wagmi";
 import { useLoginConfig } from "./Context";
 import GasTankAbi from "@latticexyz/gas-tank/out/IWorld.sol/IWorld.abi.json";
 import { getGasTankBalanceKey } from "./useGasTankBalance";
+// TODO: we won't be able to import this, pull from context instead
 import { queryClient } from "../common";
 import { waitForTransactionReceipt } from "wagmi/actions";
 
@@ -13,6 +14,8 @@ export function GasAllowanceDialogContent() {
   const userAccount = useAccount();
   const userAccountAddress = userAccount.address;
   const { writeContractAsync, isPending, error } = useWriteContract();
+
+  // TODO: switch chain
 
   return (
     <Dialog.Content>
@@ -36,6 +39,7 @@ export function GasAllowanceDialogContent() {
               args: [userAccountAddress],
               value: parseEther("0.01"),
             });
+            // TODO: move to hook
             await waitForTransactionReceipt(wagmiConfig, { hash });
             // invalidating this cache will cause the balance to be fetched again
             // but this could fail for load balanced RPCs that aren't fully in sync

@@ -7,39 +7,13 @@ import modulesConfig from "@latticexyz/world-modules/internal/mud.config";
 import { getRecord } from "./getRecord";
 import { useCreatePromise } from "./useCreatePromise";
 import { Account, Address, Chain, Hex, Transport, WalletClient, encodeFunctionData } from "viem";
-import { signTypedData, waitForTransactionReceipt, writeContract } from "viem/actions";
-import { callWithSignatureTypes } from "@latticexyz/world/internal";
+import { waitForTransactionReceipt, writeContract } from "viem/actions";
 import CallWithSignatureAbi from "@latticexyz/world-modules/out/IUnstable_CallWithSignatureSystem.sol/IUnstable_CallWithSignatureSystem.abi.json";
 import IBaseWorldAbi from "@latticexyz/world/out/IBaseWorld.sol/IBaseWorld.abi.json";
 import { AppAccountClient, unlimitedDelegationControlId } from "./common";
 import { store } from "./store";
 import { resourceToHex } from "@latticexyz/common";
-
-// TODO: move this out and turn args into object
-async function signCall(
-  chainId: number,
-  worldAddress: Address,
-  walletClient: WalletClient<Transport, Chain, Account>,
-  systemId: Hex,
-  callData: Hex,
-  nonce: bigint,
-) {
-  return await signTypedData(walletClient, {
-    account: walletClient.account,
-    domain: {
-      chainId,
-      verifyingContract: worldAddress,
-    },
-    types: callWithSignatureTypes,
-    primaryType: "Call",
-    message: {
-      signer: walletClient.account.address,
-      systemId,
-      callData,
-      nonce,
-    },
-  });
-}
+import { signCall } from "./signCall";
 
 // TODO: move this out and turn args into object
 async function registerDelegationWithSignature(
@@ -129,7 +103,7 @@ export function AccountDelegationDialogContent() {
       throw new Error("Failed to register delegation.");
     }
 
-    // TODO: figure out why this isn't dismissing the modal
+    // TODO: invalidate delegation query key
     store.setState({ delegationTransaction: hash });
   });
 

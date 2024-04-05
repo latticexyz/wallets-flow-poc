@@ -20,11 +20,12 @@ export type GetRecordOptions<table extends Table> = {
   storeAddress: Address;
   table: table;
   key: schemaToPrimitives<getKeySchema<table>>;
+  blockTag?: "latest" | "pending";
 };
 
 export async function getRecord<table extends Table>(
   publicClient: PublicClient,
-  { storeAddress, table, key }: GetRecordOptions<table>,
+  { storeAddress, table, key, blockTag }: GetRecordOptions<table>,
 ): Promise<schemaToPrimitives<table["schema"]>> {
   const keyTuple = encodeKeyTuple(getKeySchema(table), key);
 
@@ -33,6 +34,7 @@ export async function getRecord<table extends Table>(
     abi: IStoreReadAbi,
     functionName: "getRecord",
     args: [table.tableId, keyTuple],
+    blockTag,
   });
 
   return {

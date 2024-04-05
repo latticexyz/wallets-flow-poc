@@ -6,9 +6,10 @@ import { LoginRequirement } from "./common";
 import { useMemo } from "react";
 import { assertExhaustive } from "@latticexyz/common/utils";
 import { satisfy } from "@latticexyz/common/type-utils";
+import { GasSpenderDialogContent } from "./GasSpenderDialogContent";
 
 export type Props = Pick<Dialog.RootProps, "open" | "onOpenChange"> & {
-  requirement: satisfy<LoginRequirement, "appSigner" | "gasAllowance" | "accountDelegation">;
+  requirement: satisfy<LoginRequirement, "appSigner" | "gasAllowance" | "gasSpender" | "accountDelegation">;
 };
 
 export function LoginDialog({ requirement, ...dialogProps }: Props) {
@@ -18,6 +19,8 @@ export function LoginDialog({ requirement, ...dialogProps }: Props) {
         return <AppSignerDialogContent />;
       case "gasAllowance":
         return <GasAllowanceDialogContent />;
+      case "gasSpender":
+        return <GasSpenderDialogContent />;
       case "accountDelegation":
         return <AccountDelegationDialogContent />;
       default:

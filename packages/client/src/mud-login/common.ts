@@ -15,7 +15,13 @@ export type MUDLoginConfig = {
   gasTankAddress: Address;
 };
 
-export const loginRequirements = ["connectedWallet", "appSigner", "gasAllowance", "accountDelegation"] as const;
+export const loginRequirements = [
+  "connectedWallet",
+  "appSigner",
+  "gasAllowance",
+  "gasSpender",
+  "accountDelegation",
+] as const;
 
 export type LoginRequirement = (typeof loginRequirements)[number];
 

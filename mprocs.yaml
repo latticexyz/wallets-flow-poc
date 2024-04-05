@@ -10,4 +10,4 @@ procs:
     shell: pnpm run dev
   anvil:
     cwd: packages/contracts
-    shell: anvil --base-fee 0
+    shell: anvil --block-time 2 --base-fee 0

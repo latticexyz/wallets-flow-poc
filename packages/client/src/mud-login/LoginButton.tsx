@@ -35,6 +35,15 @@ export function LoginButton() {
     );
   }
 
+  if (requirement === "gasSpender") {
+    return (
+      <>
+        <Button onClick={openLoginDialog}>Top up</Button>
+        <LoginDialog requirement={requirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
+      </>
+    );
+  }
+
   if (requirement === "accountDelegation") {
     return (
       <>
