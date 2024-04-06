@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useAccount, usePublicClient } from "wagmi";
-import { http, maxUint256, toHex } from "viem";
+import { http, maxUint256, toHex, weiUnits } from "viem";
 import { callFrom } from "@latticexyz/world/internal";
 import { createSmartAccountClient } from "permissionless";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
@@ -50,7 +50,7 @@ export function useAppAccountClient(): AppAccountClient | undefined {
               // the cost would exceed the user's balance.
               // We override the user's balance in the paymaster contract to make the gas estimation succeed.
               [gasTankAddress]: {
-                state: { [getUserBalanceSlot(userAddress)]: toHex(maxUint256) },
+                stateDiff: { [getUserBalanceSlot(userAddress)]: toHex(maxUint256) },
               },
             },
           );
