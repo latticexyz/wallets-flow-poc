@@ -13,3 +13,4 @@ TODO
 - handle interacting with UI if we've not fully logged in
 - figure out why waitForTransaction stalls and is slower than getting events
 - wallet client -> user account client
+- align pending blockTag

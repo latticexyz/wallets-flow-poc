@@ -1,9 +1,9 @@
 import { resourceToHex } from "@latticexyz/common";
-import { Address, Hex, concatHex, hexToBigInt, keccak256, padHex, toBytes, toHex } from "viem";
+import { Address, Hex, concatHex, encodeAbiParameters, hexToBigInt, keccak256, toBytes, toHex } from "viem";
 
 export function getUserBalanceSlot(user: Address) {
   return getStaticDataLocation(resourceToHex({ type: "table", namespace: "", name: "UserBalances" }), [
-    padHex(user, { dir: "left", size: 32 }),
+    encodeAbiParameters([{ type: "address" }], [user]),
   ]);
 }
 

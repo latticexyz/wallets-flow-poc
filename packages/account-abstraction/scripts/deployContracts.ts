@@ -29,19 +29,19 @@ export async function deployContracts() {
     }),
   );
 
-  console.log(
-    "funded gas tank",
-    await waitForTransactionReceipt(deployerClient, {
-      hash: await writeContract(deployerClient, {
-        address: getGasTankAddress(deployerClient.chain.id)!,
-        abi: GasTankAbi,
-        functionName: "depositTo",
-        // TODO: replace with actual address
-        args: ["0xd90807BB3bd1F7B4486ab94F5dc6eF9759e02aFa"],
-        value: parseEther("50"),
-      }),
-    }),
-  );
+  // console.log(
+  //   "funded gas tank",
+  //   await waitForTransactionReceipt(deployerClient, {
+  //     hash: await writeContract(deployerClient, {
+  //       address: getGasTankAddress(deployerClient.chain.id)!,
+  //       abi: GasTankAbi,
+  //       functionName: "depositTo",
+  //       // TODO: replace with actual address
+  //       args: ["0xd90807BB3bd1F7B4486ab94F5dc6eF9759e02aFa"],
+  //       value: parseEther("50"),
+  //     }),
+  //   }),
+  // );
 }
 
 deployContracts();

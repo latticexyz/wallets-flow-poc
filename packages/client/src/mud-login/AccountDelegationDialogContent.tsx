@@ -1,6 +1,6 @@
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useAppAccountClient } from "./useAppAccountClient";
-import { useAccount, usePublicClient, useSwitchChain, useWalletClient } from "wagmi";
+import { useAccount, usePublicClient, useWalletClient } from "wagmi";
 import { useLoginConfig } from "./Context";
 import modulesConfig from "@latticexyz/world-modules/internal/mud.config";
 
@@ -70,7 +70,6 @@ export function AccountDelegationDialogContent() {
   const { data: walletClient } = useWalletClient({ chainId });
   const userAccount = useAccount();
   const appAccountClient = useAppAccountClient();
-  const { switchChain, isPending: switchChainPending } = useSwitchChain();
 
   const [registerDelegationResult, registerDelegation] = useCreatePromise(async () => {
     if (!publicClient) throw new Error("Public client not ready. Not connected?");
@@ -122,15 +121,9 @@ export function AccountDelegationDialogContent() {
             Cancel
           </Button>
         </Dialog.Close>
-        {userAccount.chainId !== chainId ? (
-          <Button loading={switchChainPending} onClick={() => switchChain({ chainId })}>
-            Switch chain
-          </Button>
-        ) : (
-          <Button loading={registerDelegationResult.status === "pending"} onClick={registerDelegation}>
-            Set up delegation
-          </Button>
-        )}
+        <Button loading={registerDelegationResult.status === "pending"} onClick={registerDelegation}>
+          Set up delegation
+        </Button>
       </Flex>
     </Dialog.Content>
   );
