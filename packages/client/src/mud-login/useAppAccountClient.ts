@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useAccount, usePublicClient } from "wagmi";
-import { http, maxUint256, toHex, weiUnits } from "viem";
+import { http, maxUint256, toHex } from "viem";
 import { callFrom } from "@latticexyz/world/internal";
 import { createSmartAccountClient } from "permissionless";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
