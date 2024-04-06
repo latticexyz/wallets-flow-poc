@@ -36,7 +36,6 @@ export function useAppAccountClient(): AppAccountClient | undefined {
       bundlerTransport: http("http://127.0.0.1:4337"),
       middleware: {
         sponsorUserOperation: async ({ userOperation }) => {
-          // TODO: why does the gas estimation fail but the call succeeds if the gas limits are hard coded?
           const gasEstimates = await pimlicoBundlerClient.estimateUserOperationGas(
             {
               userOperation: {
@@ -54,14 +53,6 @@ export function useAppAccountClient(): AppAccountClient | undefined {
               },
             },
           );
-
-          // const gasEstimates = {
-          //   preVerificationGas: 1_000_000n,
-          //   verificationGasLimit: 1_000_000n,
-          //   callGasLimit: 1_000_000n,
-          //   paymasterVerificationGasLimit: 1_000_000n,
-          //   paymasterPostOpGasLimit: 1_000_000n,
-          // };
 
           return {
             paymasterData: "0x",
