@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useAccount, usePublicClient } from "wagmi";
-import { http } from "viem";
+import { http, maxUint256, toHex } from "viem";
 import { callFrom } from "@latticexyz/world/internal";
 import { createSmartAccountClient } from "permissionless";
 import { createPimlicoBundlerClient } from "permissionless/clients/pimlico";
@@ -9,6 +9,7 @@ import { useLoginConfig } from "./Context";
 import { useAppSigner } from "./useAppSigner";
 import { useAppAccount } from "./useAppAccount";
 import { AppAccountClient, accountAbstractionEntryPoint } from "./common";
+import { getUserBalanceSlot } from "./getUserBalanceSlot";
 
 export function useAppAccountClient(): AppAccountClient | undefined {
   const [appSignerAccount] = useAppSigner();
@@ -35,13 +36,23 @@ export function useAppAccountClient(): AppAccountClient | undefined {
       bundlerTransport: http("http://127.0.0.1:4337"),
       middleware: {
         sponsorUserOperation: async ({ userOperation }) => {
-          const gasEstimates = await pimlicoBundlerClient.estimateUserOperationGas({
-            userOperation: {
-              ...userOperation,
-              paymaster: gasTankAddress,
-              paymasterData: "0x",
+          const gasEstimates = await pimlicoBundlerClient.estimateUserOperationGas(
+            {
+              userOperation: {
+                ...userOperation,
+                paymaster: gasTankAddress,
+                paymasterData: "0x",
+              },
             },
-          });
+            {
+              // Pimlico's gas estimation runs with high gas limits, which can make the estimation fail if
+              // the cost would exceed the user's balance.
+              // We override the user's balance in the paymaster contract to make the gas estimation succeed.
+              [gasTankAddress]: {
+                stateDiff: { [getUserBalanceSlot(userAddress)]: toHex(maxUint256) },
+              },
+            },
+          );
 
           return {
             paymasterData: "0x",
