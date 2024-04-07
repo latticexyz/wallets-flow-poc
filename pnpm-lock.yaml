@@ -84,6 +84,9 @@ importers:
       '@latticexyz/gas-tank':
         specifier: link:../../../gas-tank
         version: link:../../../gas-tank
+      '@latticexyz/mud-login':
+        specifier: link:../../../mud/packages/mud-login
+        version: link:../../../mud/packages/mud-login
       '@latticexyz/protocol-parser':
         specifier: link:../../../mud/packages/protocol-parser
         version: link:../../../mud/packages/protocol-parser
