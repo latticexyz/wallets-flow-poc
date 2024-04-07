@@ -1,11 +1,10 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
-import { useStore } from "zustand/react";
+import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
 
-const store = createStore(() => ({ dialogOpen: false }));
+const store = createStore(() => ({ open: false }));
 
-// TODO: split this out into multiple hooks
 export type UseLoginDialogResult = {
   // TODO: figure out how to get this to be not undefined?
   readonly openConnectModal: (() => void) | undefined;
@@ -17,18 +16,18 @@ export type UseLoginDialogResult = {
 
 export function useLoginDialog(): UseLoginDialogResult {
   const { openConnectModal } = useConnectModal();
-  const loginDialogOpen = useStore(store, (state) => state.dialogOpen);
+  const loginDialogOpen = useStore(store, (state) => state.open);
 
   const openLoginDialog = useCallback(() => {
-    store.setState({ dialogOpen: true });
+    store.setState({ open: true });
   }, []);
 
   const closeLoginDialog = useCallback(() => {
-    store.setState({ dialogOpen: false });
+    store.setState({ open: false });
   }, []);
 
   const toggleLoginDialog = useCallback((open: boolean) => {
-    store.setState({ dialogOpen: open });
+    store.setState({ open });
   }, []);
 
   return useMemo(
