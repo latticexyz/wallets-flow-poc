@@ -9,10 +9,10 @@ import { resourceToHex } from "@latticexyz/common";
 import GasTankAbi from "@latticexyz/gas-tank/out/IWorld.sol/IWorld.abi.json";
 import { callWithSignature } from "./callWithSignature";
 import { isGasSpenderKey } from "./useIsGasSpender";
-// TODO: we won't be able to import this, pull from context instead
-import { queryClient } from "../common";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function GasSpenderDialogContent() {
+  const queryClient = useQueryClient();
   const { chainId, gasTankAddress } = useLoginConfig();
   const publicClient = usePublicClient({ chainId });
   const { data: userAccountClient } = useWalletClient();

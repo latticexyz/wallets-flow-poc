@@ -4,16 +4,32 @@ import { useAccount, useConfig, useWriteContract } from "wagmi";
 import { useLoginConfig } from "./Context";
 import GasTankAbi from "@latticexyz/gas-tank/out/IWorld.sol/IWorld.abi.json";
 import { getGasTankBalanceKey } from "./useGasTankBalance";
-// TODO: we won't be able to import this, pull from context instead
-import { queryClient } from "../common";
 import { waitForTransactionReceipt } from "wagmi/actions";
+import { useQueryClient } from "@tanstack/react-query";
 
 export function GasAllowanceDialogContent() {
+  const queryClient = useQueryClient();
   const wagmiConfig = useConfig();
   const { chainId, gasTankAddress } = useLoginConfig();
   const userAccount = useAccount();
   const userAccountAddress = userAccount.address;
-  const { writeContractAsync, isPending, error } = useWriteContract();
+  const { writeContractAsync, isPending, error } = useWriteContract({
+    mutation: {
+      onSuccess: async (hash) => {
+        const receipt = await waitForTransactionReceipt(wagmiConfig, { hash });
+        if (receipt.status === "success") {
+          // invalidating this cache will cause the balance to be fetched again
+          // but this could fail for load balanced RPCs that aren't fully in sync
+          // where the one we got the receipt one is ahead of the one that will
+          // refetch the balance
+          // TODO: figure out a better fix? maybe just assume we're good to go?
+          queryClient.invalidateQueries({
+            queryKey: getGasTankBalanceKey({ chainId, gasTankAddress, userAccountAddress }),
+          });
+        }
+      },
+    },
+  });
 
   return (
     <Dialog.Content>
@@ -30,24 +46,13 @@ export function GasAllowanceDialogContent() {
           onClick={async () => {
             if (!userAccountAddress) return;
 
-            const hash = await writeContractAsync({
+            await writeContractAsync({
               chainId,
               address: gasTankAddress,
               abi: GasTankAbi,
               functionName: "depositTo",
               args: [userAccountAddress],
               value: parseEther("0.01"),
-            });
-
-            // TODO: move to hook
-            await waitForTransactionReceipt(wagmiConfig, { hash });
-            // invalidating this cache will cause the balance to be fetched again
-            // but this could fail for load balanced RPCs that aren't fully in sync
-            // where the one we got the receipt one is ahead of the one that will
-            // refetch the balance
-            // TODO: figure out a better fix? maybe just assume we're good to go?
-            queryClient.invalidateQueries({
-              queryKey: getGasTankBalanceKey({ chainId, gasTankAddress, userAccountAddress }),
             });
           }}
         >
