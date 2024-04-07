@@ -1,7 +1,9 @@
 import { useConnectModal } from "@rainbow-me/rainbowkit";
 import { useCallback, useMemo } from "react";
-import { store } from "./store";
-import { useStore } from "./useStore";
+import { useStore } from "zustand/react";
+import { createStore } from "zustand/vanilla";
+
+const store = createStore(() => ({ dialogOpen: false }));
 
 // TODO: split this out into multiple hooks
 export type UseLoginDialogResult = {
@@ -15,7 +17,7 @@ export type UseLoginDialogResult = {
 
 export function useLoginDialog(): UseLoginDialogResult {
   const { openConnectModal } = useConnectModal();
-  const loginDialogOpen = useStore((state) => state.dialogOpen);
+  const loginDialogOpen = useStore(store, (state) => state.dialogOpen);
 
   const openLoginDialog = useCallback(() => {
     store.setState({ dialogOpen: true });
