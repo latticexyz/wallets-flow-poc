@@ -19,7 +19,7 @@ import { signCall } from "./signCall";
 async function registerDelegationWithSignature(
   chainId: number,
   worldAddress: Address,
-  walletClient: WalletClient<Transport, Chain, Account>,
+  userAccountClient: WalletClient<Transport, Chain, Account>,
   appAccountClient: AppAccountClient,
   delegatee: Hex,
   delegationControlId: Hex,
@@ -33,13 +33,13 @@ async function registerDelegationWithSignature(
     args: [delegatee, delegationControlId, initCallData],
   });
 
-  const signature = await signCall(chainId, worldAddress, walletClient, systemId, callData, nonce);
+  const signature = await signCall(chainId, worldAddress, userAccountClient, systemId, callData, nonce);
 
   return writeContract(appAccountClient, {
     address: worldAddress,
     abi: CallWithSignatureAbi,
     functionName: "callWithSignature",
-    args: [walletClient.account.address, systemId, callData, signature],
+    args: [userAccountClient.account.address, systemId, callData, signature],
   });
 }
 
@@ -47,7 +47,7 @@ async function registerDelegationWithSignature(
 function registerUnlimitedDelegationWithSignature(
   chainId: number,
   worldAddress: Address,
-  walletClient: WalletClient<Transport, Chain, Account>,
+  userAccountClient: WalletClient<Transport, Chain, Account>,
   appAccountClient: AppAccountClient,
   delegatee: Hex,
   nonce: bigint,
@@ -55,7 +55,7 @@ function registerUnlimitedDelegationWithSignature(
   return registerDelegationWithSignature(
     chainId,
     worldAddress,
-    walletClient,
+    userAccountClient,
     appAccountClient,
     delegatee,
     unlimitedDelegationControlId,
@@ -67,13 +67,13 @@ function registerUnlimitedDelegationWithSignature(
 export function AccountDelegationDialogContent() {
   const { chainId, worldAddress } = useLoginConfig();
   const publicClient = usePublicClient({ chainId });
-  const { data: walletClient } = useWalletClient({ chainId });
+  const { data: userAccountClient } = useWalletClient({ chainId });
   const userAccount = useAccount();
   const appAccountClient = useAppAccountClient();
 
   const [registerDelegationResult, registerDelegation] = useCreatePromise(async () => {
     if (!publicClient) throw new Error("Public client not ready. Not connected?");
-    if (!walletClient) throw new Error("Wallet client not ready. Not connected?");
+    if (!userAccountClient) throw new Error("Wallet client not ready. Not connected?");
     if (!userAccount.address) throw new Error("User account not ready. Not connected?");
     if (!appAccountClient) throw new Error("App account client not ready.");
 
@@ -89,7 +89,7 @@ export function AccountDelegationDialogContent() {
     const hash = await registerUnlimitedDelegationWithSignature(
       chainId,
       worldAddress,
-      walletClient,
+      userAccountClient,
       appAccountClient,
       appAccountClient.account.address,
       record.nonce,

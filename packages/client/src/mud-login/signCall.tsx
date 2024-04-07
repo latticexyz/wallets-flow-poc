@@ -6,13 +6,13 @@ import { callWithSignatureTypes } from "@latticexyz/world/internal";
 export async function signCall(
   chainId: number,
   worldAddress: Address,
-  walletClient: WalletClient<Transport, Chain, Account>,
+  userAccountClient: WalletClient<Transport, Chain, Account>,
   systemId: Hex,
   callData: Hex,
   nonce: bigint,
 ) {
-  return await signTypedData(walletClient, {
-    account: walletClient.account,
+  return await signTypedData(userAccountClient, {
+    account: userAccountClient.account,
     domain: {
       chainId,
       verifyingContract: worldAddress,
@@ -20,7 +20,7 @@ export async function signCall(
     types: callWithSignatureTypes,
     primaryType: "Call",
     message: {
-      signer: walletClient.account.address,
+      signer: userAccountClient.account.address,
       systemId,
       callData,
       nonce,
