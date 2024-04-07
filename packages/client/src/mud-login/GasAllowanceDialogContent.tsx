@@ -38,6 +38,7 @@ export function GasAllowanceDialogContent() {
               args: [userAccountAddress],
               value: parseEther("0.01"),
             });
+
             // TODO: move to hook
             await waitForTransactionReceipt(wagmiConfig, { hash });
             // invalidating this cache will cause the balance to be fetched again

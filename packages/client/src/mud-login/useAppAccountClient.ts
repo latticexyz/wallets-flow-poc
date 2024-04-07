@@ -8,8 +8,9 @@ import { call, getTransactionCount } from "viem/actions";
 import { useLoginConfig } from "./Context";
 import { useAppSigner } from "./useAppSigner";
 import { useAppAccount } from "./useAppAccount";
-import { AppAccountClient, accountAbstractionEntryPoint } from "./common";
+import { AppAccountClient, entryPointAddress } from "./common";
 import { getUserBalanceSlot } from "./getUserBalanceSlot";
+import { getEntryPointDepositSlot } from "./getEntryPointDepositSlot";
 
 export function useAppAccountClient(): AppAccountClient | undefined {
   const [appSignerAccount] = useAppSigner();
@@ -27,7 +28,7 @@ export function useAppAccountClient(): AppAccountClient | undefined {
     const pimlicoBundlerClient = createPimlicoBundlerClient({
       chain: publicClient.chain,
       transport: http("http://127.0.0.1:4337"),
-      entryPoint: accountAbstractionEntryPoint,
+      entryPoint: entryPointAddress,
     });
 
     const appAccountClient = createSmartAccountClient({
@@ -47,9 +48,17 @@ export function useAppAccountClient(): AppAccountClient | undefined {
             {
               // Pimlico's gas estimation runs with high gas limits, which can make the estimation fail if
               // the cost would exceed the user's balance.
-              // We override the user's balance in the paymaster contract to make the gas estimation succeed.
+              // We override the user's balance in the paymaster contract and the deposit balance of the
+              // paymaster in the entry point contract to make the gas estimation succeed.
               [gasTankAddress]: {
-                stateDiff: { [getUserBalanceSlot(userAddress)]: toHex(maxUint256) },
+                stateDiff: {
+                  [getUserBalanceSlot(userAddress)]: toHex(maxUint256),
+                },
+              },
+              [entryPointAddress]: {
+                stateDiff: {
+                  [getEntryPointDepositSlot(gasTankAddress)]: toHex(maxUint256),
+                },
               },
             },
           );
