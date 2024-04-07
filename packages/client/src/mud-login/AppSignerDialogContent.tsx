@@ -1,5 +1,5 @@
 import { Button, Dialog, Flex } from "@radix-ui/themes";
-import { hashMessage } from "viem";
+import { keccak256 } from "viem";
 import { useSignMessage } from "wagmi";
 import { useAppSigner } from "./useAppSigner";
 
@@ -28,7 +28,7 @@ export function AppSignerDialogContent() {
               // TODO: improve message, include location.origin
               message: "Create app-signer",
             });
-            setAppSigner(hashMessage(signature));
+            setAppSigner(keccak256(signature));
           }}
         >
           Generate signer

@@ -8,7 +8,7 @@ import { waitForTransactionReceipt } from "viem/actions";
 import { resourceToHex } from "@latticexyz/common";
 import GasTankAbi from "@latticexyz/gas-tank/out/IWorld.sol/IWorld.abi.json";
 import { callWithSignature } from "./callWithSignature";
-import { isGasSpenderKey } from "./useIsGasSpender";
+import { isGasSpenderQueryKey } from "./useIsGasSpender";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function GasSpenderDialogContent() {
@@ -52,7 +52,7 @@ export function GasSpenderDialogContent() {
     // refetch the balance
     // TODO: figure out a better fix? maybe just assume we're good to go?
     queryClient.invalidateQueries({
-      queryKey: isGasSpenderKey({
+      queryKey: isGasSpenderQueryKey({
         chainId,
         gasTankAddress,
         userAccountAddress: userAccountClient.account.address,

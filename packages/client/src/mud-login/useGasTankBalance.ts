@@ -12,7 +12,7 @@ export type GetGasTankBalanceOptions = {
   userAccountAddress: Address;
 };
 
-export function getGasTankBalanceKey(data: {
+export function getGasTankBalanceQueryKey(data: {
   chainId: number;
   gasTankAddress: Address;
   userAccountAddress: Address | undefined;
@@ -43,7 +43,7 @@ export function useGasTankBalance(): bigint | undefined {
   const userAccount = useAccount();
   const userAccountAddress = userAccount.address;
 
-  const queryKey = getGasTankBalanceKey({ chainId, gasTankAddress, userAccountAddress });
+  const queryKey = getGasTankBalanceQueryKey({ chainId, gasTankAddress, userAccountAddress });
 
   const result = useQuery(
     publicClient && gasTankAddress && userAccountAddress

@@ -15,7 +15,7 @@ export type IsGasSpenderOptions = {
   appAccountAddress: Address;
 };
 
-export function isGasSpenderKey(data: {
+export function isGasSpenderQueryKey(data: {
   chainId: number;
   gasTankAddress: Address;
   userAccountAddress: Address | undefined;
@@ -52,7 +52,7 @@ export function useIsGasSpender(): boolean | undefined {
   const appAccount = useAppAccount({ publicClient, appSignerAccount });
   const appAccountAddress = appAccount.data?.address;
 
-  const queryKey = isGasSpenderKey({ chainId, gasTankAddress, userAccountAddress, appAccountAddress });
+  const queryKey = isGasSpenderQueryKey({ chainId, gasTankAddress, userAccountAddress, appAccountAddress });
 
   const result = useQuery(
     publicClient && gasTankAddress && userAccountAddress && appAccountAddress

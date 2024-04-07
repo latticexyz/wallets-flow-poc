@@ -1,4 +1,3 @@
-import { useStore } from "./useStore";
 import { useAccount, usePublicClient } from "wagmi";
 import { useLoginConfig } from "./Context";
 import { useQuery } from "@tanstack/react-query";
@@ -16,6 +15,15 @@ export type HasDelegationOptions = {
   userAccountAddress: Address;
   appAccountAddress: Address;
 };
+
+export function hasDelegationQueryKey(data: {
+  chainId: number;
+  worldAddress: Address;
+  userAccountAddress: Address | undefined;
+  appAccountAddress: Address | undefined;
+}) {
+  return ["mud:hasDelegation", data] as const;
+}
 
 export async function hasDelegation({
   publicClient,
@@ -41,20 +49,16 @@ export function useHasDelegation(): boolean | undefined {
   const userAccount = useAccount();
   const [appSignerAccount] = useAppSigner();
   const appAccount = useAppAccount({ publicClient, appSignerAccount });
-  const delegationTransaction = useStore((state) => state.delegationTransaction);
 
   const userAccountAddress = userAccount.address;
   const appAccountAddress = appAccount.data?.address;
 
-  const queryKey = [
-    "mud:hasDelegation",
-    publicClient?.chain.id,
+  const queryKey = hasDelegationQueryKey({
+    chainId,
     worldAddress,
     userAccountAddress,
     appAccountAddress,
-    // TODO: clear this cache key during delegation rather than adding a tx to store
-    delegationTransaction,
-  ] as const;
+  });
 
   const result = useQuery(
     publicClient && worldAddress && userAccountAddress && appAccountAddress

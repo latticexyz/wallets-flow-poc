@@ -1,110 +1,61 @@
 import { Button, Dialog, Flex } from "@radix-ui/themes";
 import { useAppAccountClient } from "./useAppAccountClient";
-import { useAccount, usePublicClient, useWalletClient } from "wagmi";
+import { usePublicClient, useWalletClient } from "wagmi";
 import { useLoginConfig } from "./Context";
-import modulesConfig from "@latticexyz/world-modules/internal/mud.config";
-
-import { getRecord } from "./getRecord";
-import { useCreatePromise } from "./useCreatePromise";
-import { Account, Address, Chain, Hex, Transport, WalletClient, encodeFunctionData } from "viem";
-import { waitForTransactionReceipt, writeContract } from "viem/actions";
-import CallWithSignatureAbi from "@latticexyz/world-modules/out/IUnstable_CallWithSignatureSystem.sol/IUnstable_CallWithSignatureSystem.abi.json";
+import { encodeFunctionData } from "viem";
+import { waitForTransactionReceipt } from "viem/actions";
 import IBaseWorldAbi from "@latticexyz/world/out/IBaseWorld.sol/IBaseWorld.abi.json";
-import { AppAccountClient, unlimitedDelegationControlId } from "./common";
-import { store } from "./store";
+import { unlimitedDelegationControlId } from "./common";
 import { resourceToHex } from "@latticexyz/common";
-import { signCall } from "./signCall";
-
-// TODO: move this out and turn args into object
-async function registerDelegationWithSignature(
-  chainId: number,
-  worldAddress: Address,
-  userAccountClient: WalletClient<Transport, Chain, Account>,
-  appAccountClient: AppAccountClient,
-  delegatee: Hex,
-  delegationControlId: Hex,
-  initCallData: Hex,
-  nonce: bigint,
-) {
-  const systemId = resourceToHex({ type: "system", namespace: "", name: "Registration" });
-  const callData = encodeFunctionData({
-    abi: IBaseWorldAbi,
-    functionName: "registerDelegation",
-    args: [delegatee, delegationControlId, initCallData],
-  });
-
-  const signature = await signCall(chainId, worldAddress, userAccountClient, systemId, callData, nonce);
-
-  return writeContract(appAccountClient, {
-    address: worldAddress,
-    abi: CallWithSignatureAbi,
-    functionName: "callWithSignature",
-    args: [userAccountClient.account.address, systemId, callData, signature],
-  });
-}
-
-// TODO: move this out and turn args into object
-function registerUnlimitedDelegationWithSignature(
-  chainId: number,
-  worldAddress: Address,
-  userAccountClient: WalletClient<Transport, Chain, Account>,
-  appAccountClient: AppAccountClient,
-  delegatee: Hex,
-  nonce: bigint,
-) {
-  return registerDelegationWithSignature(
-    chainId,
-    worldAddress,
-    userAccountClient,
-    appAccountClient,
-    delegatee,
-    unlimitedDelegationControlId,
-    "0x",
-    nonce,
-  );
-}
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { callWithSignature } from "./callWithSignature";
+import { hasDelegationQueryKey } from "./useHasDelegation";
 
 export function AccountDelegationDialogContent() {
+  const queryClient = useQueryClient();
   const { chainId, worldAddress } = useLoginConfig();
   const publicClient = usePublicClient({ chainId });
   const { data: userAccountClient } = useWalletClient({ chainId });
-  const userAccount = useAccount();
   const appAccountClient = useAppAccountClient();
 
-  const [registerDelegationResult, registerDelegation] = useCreatePromise(async () => {
-    if (!publicClient) throw new Error("Public client not ready. Not connected?");
-    if (!userAccountClient) throw new Error("Wallet client not ready. Not connected?");
-    if (!userAccount.address) throw new Error("User account not ready. Not connected?");
-    if (!appAccountClient) throw new Error("App account client not ready.");
+  const { mutate, isPending, error } = useMutation({
+    mutationFn: async () => {
+      if (!publicClient) throw new Error("Public client not ready. Not connected?");
+      if (!userAccountClient) throw new Error("Wallet client not ready. Not connected?");
+      if (!appAccountClient) throw new Error("App account client not ready.");
 
-    const record = await getRecord(publicClient, {
-      storeAddress: worldAddress,
-      table: modulesConfig.tables.CallWithSignatureNonces,
-      key: { signer: userAccount.address },
-      blockTag: "pending",
-    });
-    console.log("got nonce", record);
+      console.log("registerDelegation");
+      const hash = await callWithSignature({
+        chainId,
+        worldAddress,
+        systemId: resourceToHex({ type: "system", namespace: "", name: "Registration" }),
+        callData: encodeFunctionData({
+          abi: IBaseWorldAbi,
+          functionName: "registerDelegation",
+          args: [appAccountClient.account.address, unlimitedDelegationControlId, "0x"],
+        }),
+        publicClient,
+        userAccountClient,
+        appAccountClient,
+      });
+      console.log("registerDelegation tx", hash);
 
-    console.log("registerDelegation");
-    const hash = await registerUnlimitedDelegationWithSignature(
-      chainId,
-      worldAddress,
-      userAccountClient,
-      appAccountClient,
-      appAccountClient.account.address,
-      record.nonce,
-    );
-    console.log("registerDelegation tx", hash);
+      const receipt = await waitForTransactionReceipt(publicClient, { hash });
+      console.log("registerDelegation receipt", receipt);
+      if (receipt.status === "reverted") {
+        console.error("Failed to register delegation.", receipt);
+        throw new Error("Failed to register delegation.");
+      }
 
-    const receipt = await waitForTransactionReceipt(publicClient, { hash });
-    console.log("registerDelegation receipt", receipt);
-    if (receipt.status === "reverted") {
-      console.error("Failed to register delegation.", receipt);
-      throw new Error("Failed to register delegation.");
-    }
-
-    // TODO: invalidate delegation query key
-    store.setState({ delegationTransaction: hash });
+      queryClient.invalidateQueries({
+        queryKey: hasDelegationQueryKey({
+          chainId,
+          worldAddress,
+          userAccountAddress: userAccountClient.account.address,
+          appAccountAddress: appAccountClient.account.address,
+        }),
+      });
+    },
   });
 
   return (
@@ -114,7 +65,7 @@ export function AccountDelegationDialogContent() {
         Delegation description
       </Dialog.Description>
 
-      {registerDelegationResult.status === "rejected" ? <>Error: {String(registerDelegationResult.reason)}</> : null}
+      {error ? <>Error: {String(error)}</> : null}
 
       <Flex gap="3" mt="4" justify="end">
         <Dialog.Close>
@@ -122,7 +73,7 @@ export function AccountDelegationDialogContent() {
             Cancel
           </Button>
         </Dialog.Close>
-        <Button loading={registerDelegationResult.status === "pending"} onClick={registerDelegation}>
+        <Button loading={isPending} onClick={() => mutate()}>
           Set up delegation
         </Button>
       </Flex>

@@ -3,7 +3,7 @@ import { parseEther } from "viem";
 import { useAccount, useConfig, useWriteContract } from "wagmi";
 import { useLoginConfig } from "./Context";
 import GasTankAbi from "@latticexyz/gas-tank/out/IWorld.sol/IWorld.abi.json";
-import { getGasTankBalanceKey } from "./useGasTankBalance";
+import { getGasTankBalanceQueryKey } from "./useGasTankBalance";
 import { waitForTransactionReceipt } from "wagmi/actions";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -18,13 +18,8 @@ export function GasAllowanceDialogContent() {
       onSuccess: async (hash) => {
         const receipt = await waitForTransactionReceipt(wagmiConfig, { hash });
         if (receipt.status === "success") {
-          // invalidating this cache will cause the balance to be fetched again
-          // but this could fail for load balanced RPCs that aren't fully in sync
-          // where the one we got the receipt one is ahead of the one that will
-          // refetch the balance
-          // TODO: figure out a better fix? maybe just assume we're good to go?
           queryClient.invalidateQueries({
-            queryKey: getGasTankBalanceKey({ chainId, gasTankAddress, userAccountAddress }),
+            queryKey: getGasTankBalanceQueryKey({ chainId, gasTankAddress, userAccountAddress }),
           });
         }
       },
