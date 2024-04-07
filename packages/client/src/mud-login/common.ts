@@ -17,6 +17,7 @@ export type MUDLoginConfig = {
 
 export const loginRequirements = [
   "connectedWallet",
+  "connectedChain",
   "appSigner",
   "gasAllowance",
   "gasSpender",

@@ -5,6 +5,7 @@ import { useHasDelegation } from "./useHasDelegation";
 import { useMemo } from "react";
 import { useGasTankBalance } from "./useGasTankBalance";
 import { useIsGasSpender } from "./useIsGasSpender";
+import { useLoginConfig } from "./Context";
 
 export type UseLoginRequirementsResult = {
   readonly requirement: LoginRequirement | null;
@@ -12,7 +13,8 @@ export type UseLoginRequirementsResult = {
 };
 
 export function useLoginRequirements(): UseLoginRequirementsResult {
-  const { status: accountStatus } = useAccount();
+  const { chainId } = useLoginConfig();
+  const userAccount = useAccount();
 
   const [appSignerAccount] = useAppSigner();
   const gasTankBalance = useGasTankBalance();
@@ -21,7 +23,8 @@ export function useLoginRequirements(): UseLoginRequirementsResult {
 
   return useMemo(() => {
     const satisfiesRequirement = {
-      connectedWallet: () => accountStatus === "connected",
+      connectedWallet: () => userAccount.status === "connected",
+      connectedChain: () => userAccount.chainId === chainId,
       appSigner: () => appSignerAccount != null,
       gasAllowance: () => gasTankBalance != null && gasTankBalance > 0n,
       gasSpender: () => isGasSpender === true,
@@ -34,5 +37,5 @@ export function useLoginRequirements(): UseLoginRequirementsResult {
       requirement: requirements.at(0) ?? null,
       requirements,
     };
-  }, [accountStatus, appSignerAccount, gasTankBalance, hasDelegation, isGasSpender]);
+  }, [appSignerAccount, chainId, gasTankBalance, hasDelegation, isGasSpender, userAccount.chainId, userAccount.status]);
 }

@@ -15,36 +15,7 @@ export function LoginButton() {
     );
   }
 
-  // TODO: refactor so we always display the login dialog for any of these to reduce the close/open transition when moving between states
-
-  if (requirement === "appSigner") {
-    return (
-      <>
-        <Button onClick={openLoginDialog}>Set up</Button>
-        <LoginDialog requirement={requirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
-      </>
-    );
-  }
-
-  if (requirement === "gasAllowance") {
-    return (
-      <>
-        <Button onClick={openLoginDialog}>Top up</Button>
-        <LoginDialog requirement={requirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
-      </>
-    );
-  }
-
-  if (requirement === "gasSpender") {
-    return (
-      <>
-        <Button onClick={openLoginDialog}>Top up</Button>
-        <LoginDialog requirement={requirement} open={loginDialogOpen} onOpenChange={toggleLoginDialog} />
-      </>
-    );
-  }
-
-  if (requirement === "accountDelegation") {
+  if (requirement != null) {
     return (
       <>
         <Button onClick={openLoginDialog}>Log in</Button>
