@@ -81,6 +81,7 @@ export function AccountDelegationDialogContent() {
       storeAddress: worldAddress,
       table: modulesConfig.tables.CallWithSignatureNonces,
       key: { signer: userAccount.address },
+      blockTag: "pending",
     });
     console.log("got nonce", record);
 

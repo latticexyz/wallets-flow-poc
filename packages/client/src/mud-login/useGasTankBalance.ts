@@ -31,6 +31,7 @@ export async function getGasTankBalance({
     key: {
       userAccount: userAccountAddress,
     },
+    blockTag: "pending",
   });
   return record.balance;
 }

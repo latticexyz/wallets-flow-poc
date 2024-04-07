@@ -36,6 +36,7 @@ export async function isGasSpender({
     key: {
       spender: appAccountAddress,
     },
+    blockTag: "pending",
   });
   return record.userAccount === userAccountAddress;
 }

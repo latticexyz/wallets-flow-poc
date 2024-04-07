@@ -30,6 +30,7 @@ export async function hasDelegation({
       delegator: userAccountAddress,
       delegatee: appAccountAddress,
     },
+    blockTag: "pending",
   });
   return record.delegationControlId === unlimitedDelegationControlId;
 }
