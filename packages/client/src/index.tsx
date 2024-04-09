@@ -4,7 +4,7 @@ import { App } from "./App";
 import { MUDProvider } from "./MUDContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
-import { RainbowKitProvider } from "@rainbow-me/rainbowkit";
+import { RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit";
 import { MUDLoginProvider } from "@latticexyz/mud-login";
 import { networkConfig, queryClient, wagmiConfig } from "./common";
 import { getGasTankAddress } from "account-abstraction/src/gasTank";
@@ -16,7 +16,7 @@ const root = ReactDOM.createRoot(rootElement);
 root.render(
   <WagmiProvider config={wagmiConfig}>
     <QueryClientProvider client={queryClient}>
-      <RainbowKitProvider>
+      <RainbowKitProvider theme={midnightTheme({ borderRadius: "none" })}>
         <MUDLoginProvider
           config={{
             chainId: networkConfig.chainId,

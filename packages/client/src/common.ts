@@ -10,7 +10,8 @@ export const wagmiConfig = createConfig({
   chains: [networkConfig.chain],
   pollingInterval: 1_000,
   transports: {
-    [networkConfig.chain.id]: transportObserver(fallback([webSocket(), http()])),
+    // [networkConfig.chain.id]: transportObserver(fallback([webSocket(), http()])),
+    [networkConfig.chain.id]: http(),
   },
 });
 

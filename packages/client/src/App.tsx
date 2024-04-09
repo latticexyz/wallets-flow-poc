@@ -70,9 +70,7 @@ export const App = () => {
   return (
     <>
       <LoginButton />
-
-      <ConnectButton />
-
+      {/* <ConnectButton /> */}
       <table>
         <tbody>
           {tasks.map((task) => (
