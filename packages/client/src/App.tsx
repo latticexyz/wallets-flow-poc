@@ -1,6 +1,6 @@
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { getContract } from "viem";
-import { LoginButton, useAppAccountClient } from "@latticexyz/account-kit";
+import { AccountButton, useAppAccountClient } from "@latticexyz/account-kit";
 import { useMUD } from "./MUDContext";
 import { createSystemCalls } from "./mud/createSystemCalls";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
@@ -69,7 +69,7 @@ export const App = () => {
 
   return (
     <>
-      <LoginButton />
+      <AccountButton />
       {/* <ConnectButton /> */}
       <table>
         <tbody>
