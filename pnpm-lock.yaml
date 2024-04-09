@@ -72,6 +72,9 @@ importers:
 
   packages/client:
     dependencies:
+      '@latticexyz/account-kit':
+        specifier: link:../../../mud/packages/account-kit
+        version: link:../../../mud/packages/account-kit
       '@latticexyz/common':
         specifier: link:../../../mud/packages/common
         version: link:../../../mud/packages/common
@@ -84,9 +87,6 @@ importers:
       '@latticexyz/gas-tank':
         specifier: link:../../../gas-tank
         version: link:../../../gas-tank
-      '@latticexyz/mud-login':
-        specifier: link:../../../mud/packages/mud-login
-        version: link:../../../mud/packages/mud-login
       '@latticexyz/protocol-parser':
         specifier: link:../../../mud/packages/protocol-parser
         version: link:../../../mud/packages/protocol-parser

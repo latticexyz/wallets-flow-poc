@@ -5,7 +5,7 @@ import { MUDProvider } from "./MUDContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit";
-import { MUDLoginProvider } from "@latticexyz/mud-login";
+import { MUDLoginProvider } from "@latticexyz/account-kit";
 import { networkConfig, queryClient, wagmiConfig } from "./common";
 import { getGasTankAddress } from "account-abstraction/src/gasTank";
 

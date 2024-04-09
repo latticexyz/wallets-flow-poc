@@ -11,11 +11,11 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
+    "@latticexyz/account-kit": "link:../../../mud/packages/account-kit",
     "@latticexyz/common": "link:../../../mud/packages/common",
     "@latticexyz/config": "link:../../../mud/packages/config",
     "@latticexyz/dev-tools": "link:../../../mud/packages/dev-tools",
     "@latticexyz/gas-tank": "link:../../../gas-tank",
-    "@latticexyz/mud-login": "link:../../../mud/packages/mud-login",
     "@latticexyz/protocol-parser": "link:../../../mud/packages/protocol-parser",
     "@latticexyz/react": "link:../../../mud/packages/react",
     "@latticexyz/schema-type": "link:../../../mud/packages/schema-type",
