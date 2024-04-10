@@ -13,8 +13,30 @@
 
 import { MUDChain, latticeTestnet, mudFoundry } from "@latticexyz/common/chains";
 
+export const garnetHolesky = {
+  id: 17069,
+  network: "garnet-holesky",
+  name: "Garnet Holesky",
+  nativeCurrency: { name: "Garnet Ether", symbol: "ETH", decimals: 18 },
+  rpcUrls: {
+    default: {
+      http: ["https://rpc.garnet.qry.live/"],
+    },
+    public: {
+      http: ["https://rpc.garnet.qry.live/"],
+    },
+  },
+  blockExplorers: {
+    default: {
+      name: "Blockscout",
+      url: "https://explorer.garnet.qry.live/",
+    },
+  },
+  testnet: true,
+};
+
 /*
  * See https://mud.dev/tutorials/minimal/deploy#run-the-user-interface
  * for instructions on how to add networks.
  */
-export const supportedChains: MUDChain[] = [mudFoundry, latticeTestnet];
+export const supportedChains: MUDChain[] = [mudFoundry, latticeTestnet, garnetHolesky];
