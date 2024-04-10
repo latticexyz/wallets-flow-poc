@@ -19,7 +19,7 @@ root.render(
       <RainbowKitProvider theme={midnightTheme({ borderRadius: "none" })}>
         <MUDAccountKitProvider
           config={{
-            chainId: networkConfig.chainId,
+            chainId: 17000, // TODO: change back later to -> networkConfig.chainId,
             worldAddress: networkConfig.worldAddress,
             gasTankAddress: getGasTankAddress(networkConfig.chainId)!,
           }}
