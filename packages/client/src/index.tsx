@@ -7,7 +7,7 @@ import { WagmiProvider } from "wagmi";
 import { RainbowKitProvider, midnightTheme } from "@rainbow-me/rainbowkit";
 import { MUDAccountKitProvider } from "@latticexyz/account-kit";
 import { networkConfig, queryClient, wagmiConfig } from "./common";
-import { getGasTankAddress } from "account-abstraction/src/gasTank";
+import worlds from "@latticexyz/gas-tank/worlds.json";
 
 const rootElement = document.getElementById("react-root");
 if (!rootElement) throw new Error("React root not found");
@@ -21,7 +21,7 @@ root.render(
           config={{
             chainId: networkConfig.chainId,
             worldAddress: networkConfig.worldAddress,
-            gasTankAddress: getGasTankAddress(networkConfig.chainId)!,
+            gasTankAddress: (worlds as any)[networkConfig.chainId].address,
           }}
         >
           <MUDProvider>

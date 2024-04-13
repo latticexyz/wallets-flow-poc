@@ -57,8 +57,8 @@ importers:
         specifier: link:../../../mud/packages/dev-tools
         version: link:../../../mud/packages/dev-tools
       '@latticexyz/gas-tank':
-        specifier: link:../../../gas-tank
-        version: link:../../../gas-tank
+        specifier: link:../../../mud/packages/gas-tank
+        version: link:../../../mud/packages/gas-tank
       '@latticexyz/protocol-parser':
         specifier: link:../../../mud/packages/protocol-parser
         version: link:../../../mud/packages/protocol-parser
