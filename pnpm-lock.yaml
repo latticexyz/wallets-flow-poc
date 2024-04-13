@@ -8,6 +8,9 @@ importers:
 
   .:
     devDependencies:
+      '@latticexyz/account-kit':
+        specifier: link:../mud/packages/account-kit
+        version: link:../mud/packages/account-kit
       '@latticexyz/cli':
         specifier: link:../mud/packages/cli
         version: link:../mud/packages/cli
