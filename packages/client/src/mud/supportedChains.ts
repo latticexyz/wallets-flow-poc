@@ -15,15 +15,17 @@ import { MUDChain, latticeTestnet, mudFoundry } from "@latticexyz/common/chains"
 
 export const garnetHolesky = {
   id: 17069,
-  network: "garnet-holesky",
+  sourceId: 17000,
   name: "Garnet Holesky",
   nativeCurrency: { name: "Garnet Ether", symbol: "ETH", decimals: 18 },
   rpcUrls: {
     default: {
       http: ["https://rpc.garnet.qry.live/"],
+      webSocket: ["wss://rpc.garnet.qry.live/"],
     },
     public: {
       http: ["https://rpc.garnet.qry.live/"],
+      webSocket: ["wss://rpc.garnet.qry.live/"],
     },
   },
   blockExplorers: {
@@ -33,7 +35,7 @@ export const garnetHolesky = {
     },
   },
   testnet: true,
-};
+} satisfies MUDChain;
 
 /*
  * See https://mud.dev/tutorials/minimal/deploy#run-the-user-interface
