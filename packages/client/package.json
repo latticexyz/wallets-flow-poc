@@ -11,10 +11,11 @@
     "test": "tsc --noEmit"
   },
   "dependencies": {
+    "@latticexyz/account-kit": "link:../../../mud/packages/account-kit",
     "@latticexyz/common": "link:../../../mud/packages/common",
     "@latticexyz/config": "link:../../../mud/packages/config",
     "@latticexyz/dev-tools": "link:../../../mud/packages/dev-tools",
-    "@latticexyz/gas-tank": "link:../../../gas-tank",
+    "@latticexyz/gas-tank": "link:../../../mud/packages/gas-tank",
     "@latticexyz/protocol-parser": "link:../../../mud/packages/protocol-parser",
     "@latticexyz/react": "link:../../../mud/packages/react",
     "@latticexyz/schema-type": "link:../../../mud/packages/schema-type",
@@ -29,14 +30,13 @@
     "@rainbow-me/rainbowkit": "^2.0.2",
     "@tanstack/react-query": "^5.28.8",
     "abitype": "1.0.0",
-    "account-abstraction": "workspace:*",
     "contracts": "workspace:*",
     "permissionless": "^0.1.10",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rxjs": "7.5.5",
     "usehooks-ts": "^3.0.2",
-    "viem": "2.7.12",
+    "viem": "2.9.16",
     "wagmi": "^2.5.12",
     "zustand": "^4.5.2"
   },

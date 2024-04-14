@@ -6,8 +6,7 @@ procs:
     cwd: packages/contracts
     shell: pnpm run dev
   account-abstraction:
-    cwd: packages/account-abstraction
-    shell: pnpm run dev
+    shell: pnpm local-bundler
   anvil:
     cwd: packages/contracts
     shell: anvil --block-time 2 --base-fee 0
