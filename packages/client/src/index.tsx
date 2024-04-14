@@ -24,7 +24,7 @@ root.render(
       >
         <MUDAccountKitProvider
           config={{
-            chainId: networkConfig.chainId,
+            chain: networkConfig.chain,
             worldAddress: networkConfig.worldAddress,
             gasTankAddress: (worlds as any)[networkConfig.chainId].address,
           }}

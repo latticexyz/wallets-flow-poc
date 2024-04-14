@@ -12,33 +12,37 @@
  */
 
 import { MUDChain, latticeTestnet, mudFoundry } from "@latticexyz/common/chains";
+import { holesky } from "viem/chains";
 
 export const garnetHolesky = {
   id: 17069,
   sourceId: 17000,
   name: "Garnet Holesky",
-  nativeCurrency: { name: "Garnet Ether", symbol: "ETH", decimals: 18 },
+  nativeCurrency: { name: "Holesky Ether", symbol: "ETH", decimals: 18 },
   rpcUrls: {
     default: {
-      http: ["https://rpc.garnet.qry.live/"],
-      webSocket: ["wss://rpc.garnet.qry.live/"],
+      http: ["https://rpc.garnet.qry.live"],
+      webSocket: ["wss://rpc.garnet.qry.live"],
     },
     public: {
-      http: ["https://rpc.garnet.qry.live/"],
-      webSocket: ["wss://rpc.garnet.qry.live/"],
+      http: ["https://rpc.garnet.qry.live"],
+      webSocket: ["wss://rpc.garnet.qry.live"],
     },
   },
   blockExplorers: {
     default: {
       name: "Blockscout",
-      url: "https://explorer.garnet.qry.live/",
+      url: "https://explorer.garnet.qry.live",
     },
   },
   testnet: true,
+  erc4337BundlerUrl: {
+    http: "https://bundler.garnet.qry.live",
+  },
 } satisfies MUDChain;
 
 /*
  * See https://mud.dev/tutorials/minimal/deploy#run-the-user-interface
  * for instructions on how to add networks.
  */
-export const supportedChains: MUDChain[] = [mudFoundry, latticeTestnet, garnetHolesky];
+export const supportedChains: MUDChain[] = [mudFoundry, latticeTestnet, garnetHolesky, holesky];
