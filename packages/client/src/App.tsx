@@ -71,6 +71,7 @@ export const App = () => {
     <>
       <AccountButton />
       {/* <ConnectButton /> */}
+
       <table>
         <tbody>
           {tasks.map((task) => (
