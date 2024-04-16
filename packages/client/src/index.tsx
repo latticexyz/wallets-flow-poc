@@ -5,7 +5,7 @@ import { MUDProvider } from "./MUDContext";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { WagmiProvider } from "wagmi";
 import { RainbowKitProvider, lightTheme, midnightTheme } from "@rainbow-me/rainbowkit";
-import { MUDAccountKitProvider } from "@latticexyz/account-kit";
+import { AccountKitProvider } from "@latticexyz/account-kit";
 import { networkConfig, queryClient, wagmiConfig } from "./common";
 import worlds from "@latticexyz/gas-tank/worlds.json";
 
@@ -22,7 +22,7 @@ root.render(
           darkMode: midnightTheme({ borderRadius: "none" }),
         }}
       >
-        <MUDAccountKitProvider
+        <AccountKitProvider
           config={{
             chain: networkConfig.chain,
             worldAddress: networkConfig.worldAddress,
@@ -32,7 +32,7 @@ root.render(
           <MUDProvider>
             <App />
           </MUDProvider>
-        </MUDAccountKitProvider>
+        </AccountKitProvider>
       </RainbowKitProvider>
     </QueryClientProvider>
   </WagmiProvider>,
