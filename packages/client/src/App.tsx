@@ -6,13 +6,9 @@ import { networkConfig, publicClient } from "./common";
 import { useEffect } from "react";
 import config from "contracts/mud.config";
 import { useStore } from "zustand";
-import type { Store } from "@latticexyz/account-kit/bundle";
+import { store as accountKitStore } from "@latticexyz/account-kit/bundle";
 
-export type Props = {
-  accountKitStore: Store;
-};
-
-export const App = ({ accountKitStore }: Props) => {
+export const App = () => {
   const network = useMUD();
   // const appAccountClient = useAppAccountClient();
 

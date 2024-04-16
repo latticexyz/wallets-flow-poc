@@ -9,7 +9,7 @@ import { MUDProvider } from "./MUDContext";
 import { networkConfig, queryClient, wagmiConfig } from "./common";
 import { mount } from "@latticexyz/account-kit/bundle";
 
-const { store } = mount({
+mount({
   wagmiConfig,
   accountKitConfig: {
     chain: networkConfig.chain,
@@ -29,6 +29,6 @@ const root = ReactDOM.createRoot(rootElement);
 
 root.render(
   <MUDProvider>
-    <App accountKitStore={store} />
+    <App />
   </MUDProvider>,
 );
