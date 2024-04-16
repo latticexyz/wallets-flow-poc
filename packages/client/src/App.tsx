@@ -1,18 +1,28 @@
-import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { getContract } from "viem";
-import { AccountButton, useAppAccountClient } from "@latticexyz/account-kit";
 import { useMUD } from "./MUDContext";
 import { createSystemCalls } from "./mud/createSystemCalls";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
 import { networkConfig, publicClient } from "./common";
 import { useEffect } from "react";
 import config from "contracts/mud.config";
+import { useStore } from "zustand";
+import type { Store } from "@latticexyz/account-kit/bundle";
 
-const styleUnset = { all: "unset" } as const;
+export type Props = {
+  accountKitStore: Store;
+};
 
-export const App = () => {
+export const App = ({ accountKitStore }: Props) => {
   const network = useMUD();
-  const appAccountClient = useAppAccountClient();
+  // const appAccountClient = useAppAccountClient();
+
+  // const { openAccountModal } = useAccountModal();
+  // useEffect(() => {
+  //   openAccountModal();
+  // }, [openAccountModal]);
+
+  const appAccountClient = useStore(accountKitStore, (state) => state.appAccountClient);
+  const openAccountModal = useStore(accountKitStore, (state) => state.openAccountModal);
 
   const worldContract = getContract({
     abi: IWorldAbi,
@@ -69,9 +79,9 @@ export const App = () => {
 
   return (
     <>
-      <AccountButton />
-      {/* <ConnectButton /> */}
-
+      <button type="button" onClick={openAccountModal} disabled={!openAccountModal}>
+        Sign in
+      </button>
       <table>
         <tbody>
           {tasks.map((task) => (
@@ -98,8 +108,8 @@ export const App = () => {
               <td align="right">
                 <button
                   type="button"
+                  style={{ all: "unset" }}
                   title="Delete task"
-                  style={styleUnset}
                   onClick={async (event) => {
                     event.preventDefault();
                     if (!window.confirm("Are you sure you want to delete this task?")) return;
@@ -145,7 +155,7 @@ export const App = () => {
                   }
                 }}
               >
-                <fieldset style={styleUnset}>
+                <fieldset style={{ all: "unset" }}>
                   <input type="text" name="description" />{" "}
                   <button type="submit" title="Add task">
                     Add
