@@ -2,23 +2,23 @@ import { getContract } from "viem";
 import { useMUD } from "./MUDContext";
 import { createSystemCalls } from "./mud/createSystemCalls";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
-import { networkConfig, publicClient } from "./common";
-import { useEffect } from "react";
+import { networkConfig, publicClient, wagmiConfig } from "./common";
+import { useEffect, useRef } from "react";
 import config from "contracts/mud.config";
 import { useStore } from "zustand";
-import { store as accountKitStore } from "@latticexyz/account-kit/bundle";
+import { store as accountKitStore, mountButton } from "@latticexyz/account-kit/bundle";
 
 export const App = () => {
   const network = useMUD();
   // const appAccountClient = useAppAccountClient();
-
   // const { openAccountModal } = useAccountModal();
-  // useEffect(() => {
-  //   openAccountModal();
-  // }, [openAccountModal]);
 
   const appAccountClient = useStore(accountKitStore, (state) => state.appAccountClient);
   const openAccountModal = useStore(accountKitStore, (state) => state.openAccountModal);
+
+  // useEffect(() => {
+  //   openAccountModal?.();
+  // }, [openAccountModal]);
 
   const worldContract = getContract({
     abi: IWorldAbi,
@@ -73,11 +73,38 @@ export const App = () => {
     return records;
   });
 
+  const buttonRef = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const button = buttonRef.current;
+    if (!button) return;
+    console.log("mounting button");
+    return mountButton(button, {
+      wagmiConfig,
+      accountKitConfig: {
+        chain: networkConfig.chain,
+        worldAddress: networkConfig.worldAddress,
+        appInfo: {
+          name: "Get Shit Done",
+        },
+        // erc4337: false,
+      },
+    });
+  }, []);
+
   return (
     <>
-      <button type="button" onClick={openAccountModal} disabled={!openAccountModal}>
-        Sign in
-      </button>
+      {appAccountClient ? (
+        <button type="button" disabled>
+          Signed in
+        </button>
+      ) : (
+        <button type="button" onClick={openAccountModal} disabled={!openAccountModal}>
+          Sign in
+        </button>
+      )}
+
+      <span ref={buttonRef} />
+
       <table>
         <tbody>
           {tasks.map((task) => (

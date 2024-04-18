@@ -9,19 +9,19 @@ import { MUDProvider } from "./MUDContext";
 import { networkConfig, queryClient, wagmiConfig } from "./common";
 import { mount } from "@latticexyz/account-kit/bundle";
 
-mount({
-  wagmiConfig,
-  accountKitConfig: {
-    chain: networkConfig.chain,
-    worldAddress: networkConfig.worldAddress,
-    // TODO: add gasTank to MUDChain contracts
-    // TODO: allow gasTankAddress to be undefined
-    gasTankAddress: networkConfig.chain.contracts?.gasTank?.address as any,
-    appInfo: {
-      name: "Get Shit Done",
-    },
-  },
-});
+// mount({
+//   wagmiConfig,
+//   accountKitConfig: {
+//     chain: networkConfig.chain,
+//     worldAddress: networkConfig.worldAddress,
+//     // TODO: add gasTank to MUDChain contracts
+//     // TODO: allow gasTankAddress to be undefined
+//     gasTankAddress: networkConfig.chain.contracts?.gasTank?.address as any,
+//     appInfo: {
+//       name: "Get Shit Done",
+//     },
+//   },
+// });
 
 const rootElement = document.getElementById("react-root");
 if (!rootElement) throw new Error("React root not found");

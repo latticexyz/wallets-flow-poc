@@ -14,6 +14,12 @@ importers:
       '@latticexyz/cli':
         specifier: link:../mud/packages/cli
         version: link:../mud/packages/cli
+      '@latticexyz/gas-tank':
+        specifier: link:../mud/packages/gas-tank
+        version: link:../mud/packages/gas-tank
+      '@pimlicolabs/alto':
+        specifier: github:latticexyz/alto#3192a9a
+        version: github.com/latticexyz/alto/3192a9a
       '@types/debug':
         specifier: 4.1.7
         version: 4.1.7
@@ -10753,4 +10759,14 @@ packages:
     resolution: {tarball: https://codeload.github.com/foundry-rs/forge-std/tar.gz/74cfb77e308dd188d2f58864aaf44963ae6b88b1}
     name: forge-std
     version: 1.6.0
+    dev: true
+
+  github.com/latticexyz/alto/3192a9a:
+    resolution: {tarball: https://codeload.github.com/latticexyz/alto/tar.gz/3192a9a}
+    name: root
+    version: 0.0.1
+    engines: {node: '>=18.0.0'}
+    hasBin: true
+    prepare: true
+    requiresBuild: true
     dev: true

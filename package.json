@@ -17,6 +17,8 @@
   "devDependencies": {
     "@latticexyz/cli": "link:../mud/packages/cli",
     "@latticexyz/account-kit": "link:../mud/packages/account-kit",
+    "@latticexyz/gas-tank": "link:../mud/packages/gas-tank",
+    "@pimlicolabs/alto": "github:latticexyz/alto#3192a9a",
     "@types/debug": "4.1.7",
     "@typescript-eslint/eslint-plugin": "7.1.1",
     "@typescript-eslint/parser": "7.1.1",
