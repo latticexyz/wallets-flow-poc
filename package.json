@@ -15,8 +15,10 @@
     "anvil:set-balance": "cast rpc --rpc-url http://127.0.0.1:8545 anvil_setBalance 0xC9C022FCFebE730710aE93CA9247c5Ec9d9236d0 $(cast to-unit 1ether wei)"
   },
   "devDependencies": {
-    "@latticexyz/cli": "link:../mud/packages/cli",
     "@latticexyz/account-kit": "link:../mud/packages/account-kit",
+    "@latticexyz/cli": "link:../mud/packages/cli",
+    "@latticexyz/gas-tank": "link:../mud/packages/gas-tank",
+    "@pimlicolabs/alto": "github:latticexyz/alto#3192a9a",
     "@types/debug": "4.1.7",
     "@typescript-eslint/eslint-plugin": "7.1.1",
     "@typescript-eslint/parser": "7.1.1",
