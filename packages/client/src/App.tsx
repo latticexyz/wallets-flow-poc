@@ -2,7 +2,7 @@ import { getContract } from "viem";
 import { useMUD } from "./MUDContext";
 import { createSystemCalls } from "./mud/createSystemCalls";
 import IWorldAbi from "contracts/out/IWorld.sol/IWorld.abi.json";
-import { networkConfig, publicClient, wagmiConfig } from "./common";
+import { networkConfig, publicClient } from "./common";
 import { useEffect, useRef } from "react";
 import config from "contracts/mud.config";
 import { useStore } from "zustand";
@@ -73,22 +73,12 @@ export const App = () => {
     return records;
   });
 
-  const buttonRef = useRef<HTMLSpanElement | null>(null);
+  const buttonRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
     const button = buttonRef.current;
     if (!button) return;
     console.log("mounting button");
-    return mountButton(button, {
-      wagmiConfig,
-      accountKitConfig: {
-        chain: networkConfig.chain,
-        worldAddress: networkConfig.worldAddress,
-        appInfo: {
-          name: "Get Shit Done",
-        },
-        // erc4337: false,
-      },
-    });
+    return mountButton(button);
   }, []);
 
   return (
@@ -103,7 +93,7 @@ export const App = () => {
         </button>
       )}
 
-      <span ref={buttonRef} />
+      <div ref={buttonRef} />
 
       <table>
         <tbody>
