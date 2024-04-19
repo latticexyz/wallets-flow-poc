@@ -8,7 +8,6 @@
  *   basefee set to zero to avoid transaction fees.
  * - latticeTestnet, our public test network.
  *
-
  */
 
 import { MUDChain, latticeTestnet, mudFoundry } from "@latticexyz/common/chains";
@@ -29,6 +28,9 @@ export const garnetHolesky = {
       http: ["https://rpc.garnet.qry.live"],
       webSocket: ["wss://rpc.garnet.qry.live"],
     },
+    erc4337Bundler: {
+      http: ["https://bundler.garnet.qry.live"],
+    },
   },
   blockExplorers: {
     default: {
@@ -45,10 +47,6 @@ export const garnetHolesky = {
         address: "0x49048044D57e1C92A77f79988d21Fa8fAF74E97e",
       },
     },
-  },
-  testnet: true,
-  erc4337BundlerUrl: {
-    http: "https://bundler.garnet.qry.live",
   },
 } satisfies MUDChain;
 
